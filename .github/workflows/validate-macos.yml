@@ -1,0 +1,23 @@
+name: Validate macOS
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/macos/**"
+      - ".github/workflows/validate-macos.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test --package-path apps/macos

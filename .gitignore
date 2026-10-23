@@ -1,0 +1,28 @@
+# Dependencies and builds
+node_modules/
+dist/
+.netlify/
+.trigger/
+.swiftpm/
+.build/
+DerivedData/
+*.tsbuildinfo
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.self-hosted.example
+
+# Apple
+.DS_Store
+*.xcuserstate
+xcuserdata/
+
+# Logs and coverage
+*.log
+coverage/
+apps/web/public/updates/old_updates/
+
+# Python installer tests
+__pycache__/

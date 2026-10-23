@@ -1,0 +1,39 @@
+name: Package public release candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test -- --maxWorkers=2
+      - run: npm run test:self-hosted
+      - run: npm run check:migrations
+      - run: npm run check:versions
+      - run: npm run build:web
+      - run: npm run build:server
+      - run: npm run package:extension
+      - run: npm run package:server
+      - run: npm run package:source
+      - name: Record checksums
+        working-directory: dist/releases
+        run: sha256sum todo-trackr-* > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: todo-trackr-release-candidate
+          path: dist/releases/
+          if-no-files-found: error
+
+# This prepares review artifacts. Publishing a GitHub release remains a separate,
+# deliberate action after container, extension, and signed-native verification.

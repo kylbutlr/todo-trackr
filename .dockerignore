@@ -1,0 +1,12 @@
+.git
+.env
+.env.*
+node_modules
+dist
+apps/web/dist
+apps/web/public/updates
+apps/macos/.build
+.netlify
+.trigger
+coverage
+*.log
