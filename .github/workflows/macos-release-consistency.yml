@@ -1,0 +1,55 @@
+name: macOS validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/macos/**"
+      - "apps/web/public/updates/**"
+      - "release.json"
+      - "package.json"
+      - "package-lock.json"
+      - "apps/web/package.json"
+      - "apps/browser-extension/manifest.json"
+      - "scripts/check-macos-release-consistency.mjs"
+      - "scripts/check-version-consistency.mjs"
+      - "scripts/macos-source-digest.mjs"
+      - "scripts/build-macos-app.sh"
+      - "scripts/release-macos-update.sh"
+      - ".github/workflows/macos-release-consistency.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/macos/**"
+      - "apps/web/public/updates/**"
+      - "release.json"
+      - "package.json"
+      - "package-lock.json"
+      - "apps/web/package.json"
+      - "apps/browser-extension/manifest.json"
+      - "scripts/check-macos-release-consistency.mjs"
+      - "scripts/check-version-consistency.mjs"
+      - "scripts/macos-source-digest.mjs"
+      - "scripts/build-macos-app.sh"
+      - "scripts/release-macos-update.sh"
+      - ".github/workflows/macos-release-consistency.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Compile and test native source
+        run: swift test --package-path apps/macos --jobs 2
+      - name: Verify source or binary distribution policy
+        env:
+          BASE_REVISION: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: npm run check:macos-release -- "$BASE_REVISION"

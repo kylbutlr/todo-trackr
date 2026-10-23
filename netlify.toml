@@ -1,0 +1,33 @@
+[build]
+  command = "npm run build:web"
+  publish = "apps/web/dist"
+
+[functions]
+  directory = "netlify/functions"
+
+[dev]
+  command = "npm run dev:web"
+  targetPort = 5173
+  port = 8888
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
+[[headers]]
+  for = "/updates/appcast.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Content-Type = "application/rss+xml; charset=utf-8"

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kylbutlr/app-stylr/blob/main/tokens/app-stylr.schema.json",
+  "title": "App Stylr tokens",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "brand",
+    "themes",
+    "typography",
+    "spacing",
+    "radius",
+    "size",
+    "motion",
+    "profiles",
+    "icon",
+    "accessibility"
+  ],
+  "properties": {
+    "name": {
+      "const": "App Stylr"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "brand": {
+      "$ref": "#/$defs/colorMap"
+    },
+    "themes": {
+      "type": "object",
+      "required": ["light", "dark"],
+      "properties": {
+        "light": {
+          "$ref": "#/$defs/colorMap"
+        },
+        "dark": {
+          "$ref": "#/$defs/colorMap"
+        }
+      },
+      "additionalProperties": false
+    },
+    "typography": {
+      "type": "object"
+    },
+    "spacing": {
+      "$ref": "#/$defs/numberMap"
+    },
+    "radius": {
+      "$ref": "#/$defs/numberMap"
+    },
+    "size": {
+      "type": "object"
+    },
+    "motion": {
+      "$ref": "#/$defs/numberMap"
+    },
+    "profiles": {
+      "type": "object",
+      "required": ["game"],
+      "properties": {
+        "game": {
+          "type": "object",
+          "required": [
+            "minimumViewportWidth",
+            "controlHeight",
+            "primaryControlHeight",
+            "readingTextSize",
+            "readingLineHeight",
+            "labelTextSize",
+            "labelLineHeight",
+            "disclosureSummaryHeight",
+            "disclosureToggleSize"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minimumViewportWidth": { "type": "number", "minimum": 1024 },
+            "controlHeight": { "type": "number", "minimum": 44 },
+            "primaryControlHeight": { "type": "number", "minimum": 44 },
+            "readingTextSize": { "type": "number", "minimum": 14 },
+            "readingLineHeight": { "type": "number", "minimum": 20 },
+            "labelTextSize": { "type": "number", "minimum": 12 },
+            "labelLineHeight": { "type": "number", "minimum": 16 },
+            "disclosureSummaryHeight": { "type": "number", "minimum": 64 },
+            "disclosureToggleSize": { "type": "number", "minimum": 32 }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "icon": {
+      "type": "object"
+    },
+    "accessibility": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "colorMap": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^#[0-9A-Fa-f]{6}$"
+      }
+    },
+    "numberMap": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    }
+  }
+}

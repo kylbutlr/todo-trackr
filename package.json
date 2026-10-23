@@ -1,0 +1,65 @@
+{
+  "name": "todo-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "npm run build:web",
+    "build:web": "npm --workspace @todo-tracker/web run build",
+    "dev": "npm --workspace @todo-tracker/web run dev",
+    "dev:web": "npm --workspace @todo-tracker/web run dev",
+    "install:macos": "bash scripts/install-macos.sh",
+    "release:macos": "bash scripts/release-macos-update.sh",
+    "check:macos-release": "node scripts/check-macos-release-consistency.mjs",
+    "check:migrations": "node scripts/check-migrations.mjs",
+    "check:versions": "node scripts/check-version-consistency.mjs",
+    "icons:web": "bash scripts/generate-web-icons.sh",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm --workspace @todo-tracker/web run typecheck",
+    "auth:hash": "node scripts/hash-password.mjs",
+    "push:keys": "web-push generate-vapid-keys --json",
+    "test:macos-install": "python3 -m unittest discover -s tests -p test_macos_install.py",
+    "build:server": "node scripts/build-server.mjs",
+    "start:server": "node --env-file=.env.self-hosted dist/server.mjs",
+    "db:migrate": "node --env-file=.env.self-hosted scripts/migrate-database.mjs",
+    "test:self-hosted": "vitest run --config vitest.self-hosted.config.ts",
+    "package:extension": "node scripts/package-extension.mjs",
+    "package:server": "node scripts/package-server.mjs",
+    "preview:self-hosted": "node scripts/preview-self-hosted.mjs",
+    "rehearse:self-hosted": "node scripts/rehearse-self-hosted.mjs",
+    "package:source": "node scripts/package-source.mjs"
+  },
+  "workspaces": [
+    "apps/web"
+  ],
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@netlify/blobs": "^10.7.13",
+    "@netlify/functions": "^5.3.0",
+    "@trigger.dev/sdk": "^4.7.7",
+    "jose": "^6.2.9",
+    "pg": "^8.23.1",
+    "web-push": "^3.6.7",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.11",
+    "@electric-sql/pglite-socket": "^0.2.14",
+    "@trigger.dev/build": "^4.7.7",
+    "@types/node": "^26.2.0",
+    "@types/pg": "^8.23.1",
+    "@types/web-push": "^3.6.4",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "license": "MIT",
+  "overrides": {
+    "engine.io-client": {
+      "ws": "^8.21.0"
+    }
+  }
+}

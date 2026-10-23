@@ -1,0 +1,43 @@
+<?xml version="1.0" standalone="yes"?>
+<!-- sparkle-sign-warning:
+IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires re-signing this file with generate_appcast or sign_update! The signed signature will be embedded at the end of this file.
+-->
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Todo Trackr</title>
+        <item>
+            <title>0.2.89</title>
+            <pubDate>Wed, 21 Oct 2026 09:11:40 -0700</pubDate>
+            <link>https://todotrackr.netlify.app</link>
+            <sparkle:version>2089</sparkle:version>
+            <sparkle:shortVersionString>0.2.89</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://todotrackr.netlify.app/updates/Todo-Trackr-0.2.89.zip" length="3433364" type="application/octet-stream" sparkle:edSignature="UbcGd6jSxTE6rFis2g2k3NUMud6Rgw7xl2d01jqYoMit8aO/RepcXvbDX3knqOJps8jFYmAP/m602RYOpW/QBg=="/>
+        </item>
+        <item>
+            <title>0.2.88</title>
+            <pubDate>Wed, 14 Oct 2026 13:27:06 -0700</pubDate>
+            <link>https://todotrackr.netlify.app</link>
+            <sparkle:version>2088</sparkle:version>
+            <sparkle:shortVersionString>0.2.88</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://todotrackr.netlify.app/updates/Todo-Trackr-0.2.88.zip" length="3433363" type="application/octet-stream" sparkle:edSignature="u57bu5xcsaM2fiAY/yOZq3izHeAqXjGQT0EfGjBA6RJBpggEFoB0ZDpzoPq8CXgqo4gfw2rHE1XEiMglnrwQAg=="/>
+        </item>
+        <item>
+            <title>0.2.87</title>
+            <pubDate>Mon, 28 Sep 2026 12:00:24 -0700</pubDate>
+            <link>https://todotrackr.netlify.app</link>
+            <sparkle:version>2087</sparkle:version>
+            <sparkle:shortVersionString>0.2.87</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://todotrackr.netlify.app/updates/Todo-Trackr-0.2.87.zip" length="3433389" type="application/octet-stream" sparkle:edSignature="DThOUh5Vag7OwB0Xxyrez3uVqrjHzm+kBA2AqpWTipjbMRKdikE8RKpYEte4TGWabQcthjUWhqvq8dnQWxf3Dg=="/>
+        </item>
+    </channel>
+</rss>
+<!-- sparkle-signatures:
+edSignature: i1EiTpoB8Ce7LeXe+/Dd/bsvt4R2yDosT9Xqpw+zE30eXzCmhytVOXNehJoPblVgwKWUTJ3ulMOyUpyCPo3TDw==
+length: 2601
+-->

@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE tasks
+  ADD COLUMN IF NOT EXISTS is_starred boolean NOT NULL DEFAULT false;
+
+COMMIT;

@@ -1,0 +1,3 @@
+# Keep historical private-deployment binaries out of source distributions.
+# They remain in the checkout for the existing hosted update channel.
+/apps/web/public/updates export-ignore

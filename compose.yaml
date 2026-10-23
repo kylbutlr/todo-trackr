@@ -1,0 +1,34 @@
+services:
+  database:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: todo_trackr
+      POSTGRES_USER: todo_trackr
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a unique POSTGRES_PASSWORD in .env.self-hosted}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todo_trackr -d todo_trackr"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  app:
+    build: .
+    init: true
+    ports:
+      - "127.0.0.1:8888:8888"
+    environment:
+      DATABASE_URL: postgresql://todo_trackr:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@database:5432/todo_trackr
+      TODO_TRACKER_PUBLIC_ORIGIN: ${TODO_TRACKER_PUBLIC_ORIGIN:-http://127.0.0.1:8888}
+      TODO_TRACKER_AUTH_MODE: ${TODO_TRACKER_AUTH_MODE:-password}
+      TODO_TRACKER_PASSWORD_HASH: ${TODO_TRACKER_PASSWORD_HASH:-}
+      SESSION_SIGNING_SECRET: ${SESSION_SIGNING_SECRET:-}
+      TODO_TRACKER_ALLOW_UNAUTHENTICATED_REMOTE: ${TODO_TRACKER_ALLOW_UNAUTHENTICATED_REMOTE:-false}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
+    depends_on:
+      database:
+        condition: service_healthy
+volumes:
+  database:
