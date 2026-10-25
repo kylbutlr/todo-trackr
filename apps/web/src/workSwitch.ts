@@ -18,8 +18,9 @@ export function useWorkSwitch(enabled: boolean): string | undefined {
     let stopped = false, inFlight = false;
     let previous: Permission | undefined;
     async function check() {
-      if (stopped || inFlight || document.visibilityState !== "visible") return;
+      if (stopped || inFlight || !navigator.onLine || document.visibilityState !== "visible") return;
       inFlight = true;
+      const wasAllowed = automaticWorkAllowed();
       const started = performance.now();
       try {
         const response = await fetch("/api/work-state", { credentials: "same-origin", cache: "no-store", signal: AbortSignal.timeout(5_000) });
@@ -36,7 +37,7 @@ export function useWorkSwitch(enabled: boolean): string | undefined {
             const resumed = await fetch("/api/work-resume", { method: "POST", credentials: "same-origin", signal: AbortSignal.timeout(5_000) });
             if (!resumed.ok) throw new Error("Catch-up unavailable");
         }
-        if (automaticWorkAllowed() && (!previous || previous.state !== "active" || previous.revision !== next.revision || (previous.catchUpPending && !next.catchUpPending))) {
+        if (automaticWorkAllowed() && (!wasAllowed || !previous || previous.state !== "active" || previous.revision !== next.revision || (previous.catchUpPending && !next.catchUpPending))) {
           if (!stopped && automaticWorkAllowed()) window.dispatchEvent(new Event("app-switchr-resumed"));
         }
         previous = next;
@@ -50,7 +51,8 @@ export function useWorkSwitch(enabled: boolean): string | undefined {
     const timer = window.setInterval(() => void check(), 30_000);
     const visible = () => void check();
     document.addEventListener("visibilitychange", visible);
-    return () => { stopped = true; permission = undefined; expires = 0; wallExpires = 0; window.clearInterval(timer); document.removeEventListener("visibilitychange", visible); };
+    window.addEventListener("online", visible);
+    return () => { stopped = true; permission = undefined; expires = 0; wallExpires = 0; window.clearInterval(timer); document.removeEventListener("visibilitychange", visible); window.removeEventListener("online", visible); };
   }, [enabled]);
   return label;
 }
