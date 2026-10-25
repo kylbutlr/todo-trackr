@@ -43,7 +43,7 @@ describe("bandwidth optimization", () => {
     expect(shouldPollWorkspace("hidden")).toBe(false);
     expect(workspace).toContain('workspaceModeRef.current === "tasks" && !isConnectionView(viewRef.current)');
     expect(workspace).toContain("void load(false)");
-    expect(workspace).toContain("window.setInterval(refreshWhenVisible, WORKSPACE_POLL_INTERVAL_MS)");
+    expect(workspace).toContain("return startWorkspacePolling(");
     expect([0, 1, 2, 3].map(nextTaskPollIntervalMs)).toEqual([30_000, 60_000, 120_000, 600_000]);
   });
 });

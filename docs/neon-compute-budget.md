@@ -1,5 +1,7 @@
 # Neon compute budget
 
+See the [October 25 polling audit](neon-polling-audit-2026-10-25.md) for the request inventory, deployed/native evidence, remaining exceptions, callback measurements, and CU-hours verification/rollback plan. Known-offline web Task and control polls are suppressed in the audit patch; reconnect renews permission and refreshes Tasks immediately.
+
 Todo Trackr is designed to let the production Neon compute return to Idle when Kyle is not actively using it. Neon currently documents that an idle compute can scale to zero after five minutes, so no recurring Todo Trackr database job should run every five minutes or faster. Check the current behavior in [Neon's scale-to-zero documentation](https://neon.com/docs/introduction/scale-to-zero) and the current allowance for the project's plan on [Neon pricing](https://neon.com/pricing).
 
 ## Unattended work

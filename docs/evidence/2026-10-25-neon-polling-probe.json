@@ -1,0 +1,9 @@
+{
+  "baseline": "d45b6f234c136e056bf0570d24fe530170053c6b",
+  "method": "Execute actual baseline and patched Workspace effect bodies in an isolated fake-clock context with stubbed load; visible task surface, permission allowed, navigator.onLine false; exclude initial explicit load. No HTTP or SQL.",
+  "simulatedOfflineMinutes": 60,
+  "before": { "automaticLoadCallbacks": 120, "immediateOnlineCallbacks": 0, "timersAfterCleanup": 0 },
+  "after": { "automaticLoadCallbacks": 0, "immediateOnlineCallbacks": 1, "timersAfterCleanup": 0 },
+  "productionRequestReduction": "not measured",
+  "additionalCuHourSavings": "not measured; conservative planning estimate zero for requests suppressed while truly offline"
+}

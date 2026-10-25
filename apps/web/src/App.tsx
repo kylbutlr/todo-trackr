@@ -1,6 +1,7 @@
 import { InstallationContext, legacyInstallation, useInstallation, type Installation } from "./installation";
 import { automaticWorkAllowed, useWorkSwitch } from "./workSwitch.js";
 import { useAdaptiveRefresh } from './useAdaptiveRefresh.js';
+import { startWorkspacePolling } from './workspacePolling.js';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import { api, APIError, onSessionExpired } from "./api";
@@ -28,7 +29,7 @@ import {
   writeWorkspaceLayout,
   type WorkspaceLayout,
 } from "./workspaceLayout";
-import { nextTaskPollIntervalMs, shouldPollWorkspace, WORKSPACE_POLL_INTERVAL_MS } from "./workspaceRefreshPolicy";
+import { nextTaskPollIntervalMs, WORKSPACE_POLL_INTERVAL_MS } from "./workspaceRefreshPolicy";
 import type { CodexDiagnostics, CodexSession, CodexSessionStatus, GranolaConnection, GranolaDiagnostics, ShortcutAutomationActivity, ShortcutConnection, ShortcutConnectionControlMode, ShortcutDiagnostics, ShortcutPreview, ShortcutPreviewAction, ShortcutRuleV2Shadow, ShortcutSyncRun, SystemHealth, Task, TaskList, TaskPriority, UpdateTaskInput } from "./types";
 
 type AuthState = "checking" | "signed-out" | "signed-in";
@@ -1408,31 +1409,12 @@ function Workspace({ onLogout }: { onLogout: () => void }) {
   useEffect(() => {
     void load();
 
-    const refreshTasks = () => {
+    return startWorkspacePolling((resumed) => {
+      if (resumed) unchangedTaskPolls.current = 0;
       if (automaticWorkAllowed(installation.workSwitch) && workspaceModeRef.current === "tasks" && !isConnectionView(viewRef.current)) {
         void load(false);
       }
-    };
-    const refreshOnReturn = () => {
-      if (!shouldPollWorkspace(document.visibilityState)) return;
-      unchangedTaskPolls.current = 0;
-      refreshTasks();
-    };
-    const refreshWhenVisible = () => {
-      if (automaticWorkAllowed(installation.workSwitch) && shouldPollWorkspace(document.visibilityState) && Date.now() >= nextTaskPollAt.current) refreshTasks();
-    };
-    const interval = window.setInterval(refreshWhenVisible, WORKSPACE_POLL_INTERVAL_MS);
-
-    window.addEventListener("app-switchr-resumed", refreshOnReturn);
-    window.addEventListener("focus", refreshOnReturn);
-    document.addEventListener("visibilitychange", refreshOnReturn);
-
-    return () => {
-      window.clearInterval(interval);
-      window.removeEventListener("app-switchr-resumed", refreshOnReturn);
-      window.removeEventListener("focus", refreshOnReturn);
-      document.removeEventListener("visibilitychange", refreshOnReturn);
-    };
+    }, () => Date.now() >= nextTaskPollAt.current, () => automaticWorkAllowed(installation.workSwitch));
   }, []);
 
   useEffect(() => {
