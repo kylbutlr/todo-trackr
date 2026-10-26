@@ -61,7 +61,7 @@ struct TaskItem: Codable, Identifiable, Hashable, Sendable {
         let alarmIdentity = alarmAt.map { String($0.timeIntervalSinceReferenceDate) } ?? "no-alarm"
         let clearedIdentity = alarmClearedAt.map { String($0.timeIntervalSinceReferenceDate) } ?? "active"
         let workflowStateIdentity = sourceDetails?.workflowStateName ?? "no-state"
-        return "\(id.uuidString):\(dueDateIdentity):\(alarmIdentity):\(clearedIdentity):\(workflowStateIdentity)"
+        return "\(id.uuidString):\(dueDateIdentity):\(alarmIdentity):\(clearedIdentity):\(workflowStateIdentity):\(isStarred)"
     }
 
     var isAlarmAttentionActive: Bool {

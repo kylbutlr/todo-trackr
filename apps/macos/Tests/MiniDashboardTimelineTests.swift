@@ -66,6 +66,39 @@ struct MiniDashboardTimelineTests {
         ])
     }
 
+    @Test("Favorite changes invalidate a retained Mini Trackr Task row")
+    func refreshingFavoriteInvalidatesRenderedRow() throws {
+        for dueDate in [nil, "2026-08-25T17:00:00Z"] as [String?] {
+            var current = task("Task", dueAt: dueDate, source: .shortcut, workflowStateName: "Ready for Development")
+            for isStarred in [true, false] {
+                var refreshed = current
+                refreshed.isStarred = isStarred
+                let merged = TaskSnapshotMerge.openTasks(
+                    current: [current], refreshed: [refreshed], pendingCompletionIDs: []
+                )
+                let rendered = try #require(MiniDashboardTimeline.sections(
+                    for: merged, starredOnly: false
+                ).flatMap(\.tasks).first)
+
+                #expect(rendered.id == current.id)
+                #expect(rendered.dueAt == current.dueAt)
+                #expect(rendered.isStarred == isStarred)
+                #expect(rendered.presentationIdentity != current.presentationIdentity)
+                #expect(MiniDashboardTimeline.sections(for: merged, starredOnly: true)
+                    .flatMap(\.tasks).map(\.id) == (isStarred ? [current.id] : []))
+                current = rendered
+            }
+        }
+    }
+
+    @Test("An unchanged favorite preserves Mini Trackr row identity")
+    func unchangedFavoritePreservesRenderedRow() {
+        let original = task("Task", isStarred: true)
+        var refreshed = original
+        refreshed.updatedAt = original.updatedAt.addingTimeInterval(60)
+        #expect(refreshed.presentationIdentity == original.presentationIdentity)
+    }
+
     @Test("Refreshing a due date invalidates the rendered Task row")
     func refreshingDueDateInvalidatesRenderedRow() {
         let id = UUID()
