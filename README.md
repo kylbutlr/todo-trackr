@@ -4,6 +4,12 @@ A personal task manager with a web workspace, a native macOS companion, and a Ch
 
 Todo Trackr is open-source under the [MIT license](LICENSE). Run one workspace on your own server with PostgreSQL. No Shortcut, Granola, Codex, App Switchr, or maintainer-hosted account is required.
 
+## Preview
+
+<img src="docs/images/app-preview.webp" width="640" alt="Todo Trackr workspace with fictional design review and release tasks">
+
+App preview with demo data. [App overview](https://kylbutlr.com/apps/todo-trackr).
+
 ## Public release
 
 The public release target is **v1.0.0**, distributed through [GitHub Releases](https://github.com/kylbutlr/todo-trackr/releases). This branch contains the release candidate. The server/container rehearsal and automated checks pass. Publication and an installed-extension acceptance check remain pending; see the [release plan](docs/self-hosted-release-plan.md).
@@ -26,8 +32,6 @@ Start with the [self-hosting guide](docs/self-hosting.md). Password protection i
 | Quick Capture extension | Chromium with Manifest V3 support | Zip, loaded unpacked and updated manually |
 
 The web app can also be added to a mobile home screen. Remote connections require an HTTPS endpoint that you configure. An address such as localhost always refers to the device opening it.
-
-![Todo Trackr standalone workspace](docs/images/workspace.jpg)
 
 ## Installation and clients
 
