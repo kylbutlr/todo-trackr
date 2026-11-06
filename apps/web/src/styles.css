@@ -1,4 +1,5 @@
 @import "../../../design/app-stylr.css";
+@import "../../../design/app-stylr-controls.css";
 
 @font-face {
   font-family: "Geist Sans";
@@ -46,17 +47,14 @@ svg { width: 20px; height: 20px; }
     calc(24px + env(safe-area-inset-right))
     calc(24px + env(safe-area-inset-bottom))
     calc(24px + env(safe-area-inset-left));
-  background:
-    radial-gradient(circle at 10% 10%, rgba(169, 206, 194, 0.14), transparent 32%),
-    radial-gradient(circle at 90% 85%, rgba(131, 164, 163, 0.08), transparent 34%),
-    var(--ui-canvas);
+  background: var(--ui-canvas);
 }
 
 .login-card {
   width: min(100%, 410px);
   padding: 40px;
   border: 1px solid var(--ui-border);
-  border-radius: 16px;
+  border-radius: var(--radius-dialog);
   background: var(--ui-surface);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
 }
@@ -66,12 +64,12 @@ svg { width: 20px; height: 20px; }
   height: 48px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
-  color: white;
-  background: var(--icon-gradient);
+  border-radius: 8px;
+  color: var(--icon-foreground);
+  background: var(--icon-monochrome-gradient);
 }
-.app-mark.small { width: 34px; height: 34px; border-radius: 8px; }
-.app-mark.muted { color: var(--ui-accent); background: var(--ui-selected); }
+.app-mark.small { width: 34px; height: 34px; border-radius: 5px; }
+.app-mark.muted { color: var(--icon-foreground); background: var(--icon-monochrome-gradient); }
 .app-mark.small svg { width: 17px; }
 .eyebrow { margin: 24px 0 6px; color: var(--ui-accent); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .login-card h1 { margin: 0; font-size: 32px; line-height: 38px; letter-spacing: -0.02em; }
@@ -225,17 +223,15 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .new-task input:focus-visible { outline: none; }
 .new-task button { min-height: 40px; border: 0; border-radius: var(--radius-button); padding: 8px 15px; color: var(--ui-accent-text); background: var(--ui-accent); font-size: 13px; font-weight: 600; }
 .new-task button:hover:not(:disabled) { background: var(--ui-accent-strong); }
-.task-tools { display: flex; gap: 8px; margin-top: 12px; }
+.task-panel { container: task-panel / inline-size; }
+.task-tools { --control-font-size: 13px; display: flex; gap: 8px; margin-top: 12px; }
 .task-tools > input { flex: 1 1 180px; min-width: 0; }
 .task-tools > select { flex: 0 1 240px; min-width: 0; }
 .task-tools input, .task-tools select { min-width: 0; min-height: 40px; padding: 8px 10px; font-size: 13px; }
-.task-tools select {
-  appearance: none;
-  padding-right: 40px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c7d1ce' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  background-size: 16px;
+@container task-panel (max-width: 700px) {
+  .task-tools { flex-wrap: wrap; }
+  .task-tools > input { flex-basis: 100%; }
+  .task-tools > select { flex: 1 1 130px; }
 }
 .task-tools select:disabled { cursor: default; opacity: 0.72; }
 .shortcut-board-toolbar {

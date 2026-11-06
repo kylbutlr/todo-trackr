@@ -30,7 +30,10 @@
     },
     "themes": {
       "type": "object",
-      "required": ["light", "dark"],
+      "required": [
+        "light",
+        "dark"
+      ],
       "properties": {
         "light": {
           "$ref": "#/$defs/colorMap"
@@ -58,7 +61,9 @@
     },
     "profiles": {
       "type": "object",
-      "required": ["game"],
+      "required": [
+        "game"
+      ],
       "properties": {
         "game": {
           "type": "object",
@@ -75,15 +80,42 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "minimumViewportWidth": { "type": "number", "minimum": 1024 },
-            "controlHeight": { "type": "number", "minimum": 44 },
-            "primaryControlHeight": { "type": "number", "minimum": 44 },
-            "readingTextSize": { "type": "number", "minimum": 14 },
-            "readingLineHeight": { "type": "number", "minimum": 20 },
-            "labelTextSize": { "type": "number", "minimum": 12 },
-            "labelLineHeight": { "type": "number", "minimum": 16 },
-            "disclosureSummaryHeight": { "type": "number", "minimum": 64 },
-            "disclosureToggleSize": { "type": "number", "minimum": 32 }
+            "minimumViewportWidth": {
+              "type": "number",
+              "minimum": 1024
+            },
+            "controlHeight": {
+              "type": "number",
+              "minimum": 44
+            },
+            "primaryControlHeight": {
+              "type": "number",
+              "minimum": 44
+            },
+            "readingTextSize": {
+              "type": "number",
+              "minimum": 14
+            },
+            "readingLineHeight": {
+              "type": "number",
+              "minimum": 20
+            },
+            "labelTextSize": {
+              "type": "number",
+              "minimum": 12
+            },
+            "labelLineHeight": {
+              "type": "number",
+              "minimum": 16
+            },
+            "disclosureSummaryHeight": {
+              "type": "number",
+              "minimum": 64
+            },
+            "disclosureToggleSize": {
+              "type": "number",
+              "minimum": 32
+            }
           }
         }
       },
@@ -94,6 +126,86 @@
     },
     "accessibility": {
       "type": "object"
+    },
+    "accents": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "dark",
+          "light"
+        ],
+        "properties": {
+          "dark": {
+            "$ref": "#/$defs/colorMap"
+          },
+          "light": {
+            "$ref": "#/$defs/colorMap"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "accentPresets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "name",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "surfaceTones": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "dark",
+          "light"
+        ],
+        "properties": {
+          "dark": {
+            "$ref": "#/$defs/colorMap"
+          },
+          "light": {
+            "$ref": "#/$defs/colorMap"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "surfaceTonePresets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "name",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "$defs": {

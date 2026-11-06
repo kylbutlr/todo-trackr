@@ -9,14 +9,14 @@ const output = resolve("dist/releases");
 await mkdir(output, { recursive: true });
 const staging = await mkdtemp(join(tmpdir(), "todo-trackr-extension-"));
 try {
-  for (const file of ["manifest.json", "background.js", "capture.js", "connection.js", "popup.js", "popup.html", "popup.css", "icons", "README.md"]) {
+  for (const file of ["manifest.json", "background.js", "capture.js", "connection.js", "popup.js", "popup.html", "popup.css", "icons", "fonts", "app-stylr.css", "README.md"]) {
     await cp(`apps/browser-extension/${file}`, join(staging, file), { recursive: true });
   }
   await cp("LICENSE", join(staging, "LICENSE"));
   const archive = join(output, `todo-trackr-extension-${manifest.version}.zip`);
   // Rebuilding a local artifact must not retain removed entries from an old zip.
   const temporary = join(staging, "extension.zip");
-  execFileSync("zip", ["-rq", temporary, "manifest.json", "background.js", "capture.js", "connection.js", "popup.js", "popup.html", "popup.css", "icons", "README.md", "LICENSE"], { cwd: staging });
+  execFileSync("zip", ["-rq", temporary, "manifest.json", "background.js", "capture.js", "connection.js", "popup.js", "popup.html", "popup.css", "icons", "fonts", "app-stylr.css", "README.md", "LICENSE"], { cwd: staging });
   await cp(temporary, archive);
   console.log(`${createHash("sha256").update(await readFile(archive)).digest("hex")}  ${archive}`);
 } finally { await rm(staging, { recursive: true, force: true }); }

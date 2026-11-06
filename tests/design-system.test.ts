@@ -65,12 +65,16 @@ function sha256(path: string) {
 }
 
 describe("App Stylr adoption", () => {
-  it("pins the complete v1.2.0 source consumer contract", () => {
+  it("pins the complete v1.4.1 source consumer contract", () => {
     expect(manifest).toEqual({
       name: "App Stylr",
-      version: "1.2.0",
-      sourceRevision: "b3ca31ea264d5dd233fd871ac167247f1c306985",
-      release: "https://github.com/kylbutlr/app-stylr/tree/b3ca31ea264d5dd233fd871ac167247f1c306985",
+      version: "1.4.1",
+      sourceRevision: "6fbc524f07ed7aa7db9c8593bf8116b9440937bc",
+      release: "https://github.com/kylbutlr/app-stylr/tree/v1.4.1",
+      sourceTag: "v1.4.1",
+      accent: "mint",
+      surfaceTone: "normal",
+      density: "comfortable",
       theme: "dark",
       exceptions: "docs/app-stylr-exceptions.md",
     });
@@ -128,16 +132,16 @@ describe("App Stylr adoption", () => {
     const faviconPath = new URL("apps/web/public/favicon.svg", repositoryRoot);
     expect(existsSync(faviconPath)).toBe(true);
     expect(statSync(faviconPath).size).toBeGreaterThan(0);
-    expect(webDocument).toContain('rel="icon" href="/favicon.svg"');
+    expect(webDocument).toContain('rel="icon" href="/favicon.svg?v=graphite-2"');
     expect(webDocument).toContain('name="theme-color" content="#0E0E10"');
   });
 
-  it("places the App Stylr icon highlight in the upper-right", () => {
+  it("places the neutral Graphite highlight in the upper-left", () => {
     const iconRenderer = readFileSync(
       new URL("scripts/render-macos-icon.swift", repositoryRoot),
       "utf8",
     );
 
-    expect(iconRenderer).toContain("gradient.draw(in: iconPath, angle: 45)");
+    expect(iconRenderer).toContain("gradient.draw(in: iconPath, angle: -45)");
   });
 });
