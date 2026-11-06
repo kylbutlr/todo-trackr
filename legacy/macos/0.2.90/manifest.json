@@ -1,0 +1,11 @@
+{
+  "version": "0.2.90",
+  "build": 2090,
+  "feed": "https://todotrackr.netlify.app/updates/appcast.xml",
+  "publicKey": "Jj3O3eEzKE32slvOxYYw4D39Jeg0nL/xluCupy32wio=",
+  "files": {
+    "appcast.xml": "1dec89bcee2beb995b7f770983403de4ae8c0a732557bc6c0c41fad47aa1f5de",
+    "Todo-Trackr-0.2.90.zip": "ee6b5f79dcdafdc980e5d60badfd0f0d4913782f06eb055f71495affa91e3cfc",
+    "Todo-Trackr-0.2.90.source.json": "38631cba24ee3fa00b5e7553eeb25e5a2e94d3474cb20f038b347ce1859d5801"
+  }
+}
