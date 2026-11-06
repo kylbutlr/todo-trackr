@@ -1,0 +1,40 @@
+{
+  "capturedAt": "2026-11-06T08:28:41.082Z",
+  "sourceVersion": "1.1.0",
+  "sourceRevision": "e76b0c1950dfac2cbcb08a9713a7e2d6ab25a485",
+  "appStylrVersion": "1.4.1",
+  "fictionalData": true,
+  "capture": {
+    "width": 1280,
+    "height": 900,
+    "method": "Viewport-only PNG frames of the actual owning-repository interface in one isolated headless Chromium tab."
+  },
+  "animation": {
+    "width": 960,
+    "height": 675,
+    "frames": 5,
+    "durationMs": 7800
+  },
+  "source": "Actual standalone frontend and API against a disposable local database, with five fictional tasks created through the UI. Selecting tasks opens their real detail panels.",
+  "edits": "Resized screenshots and encoded GIF/WebP with presentation pauses. No retouching, text replacement or invented controls.",
+  "coverageLimits": "These visual captures do not establish installed-extension acceptance, signed native binary delivery, live integrations, real monitoring or production data verification.",
+  "rawFrameSHA256": [
+    "e719a018e454fceb3f7fe77b10faf11f78aba57648b91f97c3ab8b5e6986c5b0",
+    "e719a018e454fceb3f7fe77b10faf11f78aba57648b91f97c3ab8b5e6986c5b0",
+    "512dc1131ec8a8f5038ce800d9606ea6f3ba600968dce2d56846468be6a5434d",
+    "13d1f4742d39aced10740d1a23b04661cfa08813e536b3fcb57bb10817c21154",
+    "a18097c64357a11f4c6f920c79c74f68565ab44fb9eb9bf1322bf9923cd6b1ee"
+  ],
+  "files": [
+    {
+      "file": "app-preview.webp",
+      "bytes": 33756,
+      "sha256": "c9922e8461f97c676b8d20934de312e43d7c7b604e8b21019d0d7f93f4bb8117"
+    },
+    {
+      "file": "app-preview.gif",
+      "bytes": 116244,
+      "sha256": "89b537385803efe6a63ce64afa0398b1a1b178639fbc2a9a322739759ff6d393"
+    }
+  ]
+}
