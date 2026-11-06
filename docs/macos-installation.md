@@ -1,6 +1,6 @@
 # Build and install the macOS source
 
-The public v1.0.0 release includes the Mac source, not a prebuilt binary. You do not need a paid Apple Developer membership to build it on your own Mac. You need Xcode with Swift 6.2 or later and a persistent local Code Signing certificate, as described in [the native setup steps](setup.md#install-the-macos-app). The resulting app connects to your selected Todo Trackr server. Source builds do not check for binary updates; pull a newer source release and rebuild.
+The public release includes the Mac source, not a prebuilt binary. You do not need a paid Apple Developer membership to build it on your own Mac. You need Xcode with Swift 6.2 or later and a persistent local Code Signing certificate, as described in [the native setup steps](setup.md#install-the-macos-app). The resulting app connects to your selected Todo Trackr server. Source builds do not check for binary updates; pull a newer source release and rebuild.
 
 Run `npm run install:macos` from a current checkout after quitting Todo Trackr yourself. The installer never quits an app. A stale checkout cannot overwrite a newer installed version through this command.
 
@@ -23,3 +23,7 @@ The complete candidate is copied and verified in a staging directory before the 
 These safeguards apply to the supported installer. Finder replacement, `ditto`, or other manual copy commands bypass it and must not be used for installation. Always inspect the installed version before replacing it. A future prebuilt binary/Sparkle distribution would require its own signing, notarization, archive provenance, and appcast acceptance. It is outside the v1.0.0 source-only Mac distribution.
 
 Run `npm run test:macos-install` to exercise downgrade prevention and failure recovery with disposable app fixtures. Tests never replace or quit an installed app.
+
+## Existing legacy installations
+
+Existing 0.2.x installations continue to use the hosted legacy Sparkle feed. The web build preserves the previously published signed 0.2.90 release through the [verified compatibility overlay](../legacy/macos/README.md). This does not turn the current source-only release into a new Mac binary distribution.
