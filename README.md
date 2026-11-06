@@ -56,7 +56,7 @@ design/                  Pinned App Stylr assets and licenses
 scripts/                 Build, packaging, migration, and release tools
 ```
 
-See [architecture](docs/architecture.md) for application boundaries and [product terminology](CONTEXT.md) for the domain model. The interface follows [App Stylr v1.2.0](https://github.com/kylbutlr/app-stylr/tree/b3ca31ea264d5dd233fd871ac167247f1c306985), pinned in [app-stylr.json](app-stylr.json). Intentional differences are recorded in [design exceptions](docs/app-stylr-exceptions.md).
+See [architecture](docs/architecture.md) for application boundaries and [product terminology](CONTEXT.md) for the domain model. The interface follows [App Stylr v1.4.1](https://github.com/kylbutlr/app-stylr/tree/v1.4.1), pinned in [app-stylr.json](app-stylr.json). Intentional differences are recorded in [design exceptions](docs/app-stylr-exceptions.md).
 
 ## Privacy, security, and maintenance
 

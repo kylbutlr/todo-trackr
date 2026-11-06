@@ -1,12 +1,12 @@
 ## App Stylr
 
-This app follows [App Stylr v1.2.0 source](https://github.com/kylbutlr/app-stylr/tree/b3ca31ea264d5dd233fd871ac167247f1c306985).
+This app follows [App Stylr v1.4.1 source](https://github.com/kylbutlr/app-stylr/tree/v1.4.1).
 
 ### Required visual review
 
 Before implementing or reviewing interface work:
 
-1. Open the rendered [App Stylr Visual Reference](https://app-stylr.netlify.app/reference/) and [App Stylr Style Guide](https://app-stylr.netlify.app/reference/style-guide.html).
+1. Open the rendered [App Stylr Visual Reference](https://kylbutlr.com/app-stylr) and [App Stylr Style Guide](https://kylbutlr.com/app-stylr).
 2. Review the relevant hierarchy, typography, spacing, controls, states, access posture, responsive behavior, accessibility, and product voice before making UI decisions.
 3. Implement with the pinned App Stylr tokens and adapters. Do not sample or approximate values from screenshots.
 4. Compare the rendered app against both guides at the relevant viewports and interaction states before considering the interface complete.
@@ -31,3 +31,7 @@ The rendered guides show current App Stylr guidance. The pinned release remains 
 - Todo Trackr supports single-owner standalone installations and a legacy protected hosted adapter. Preserve server-enforced access in password mode, explicit standalone-only passwordless configuration, and credentials scoped to the selected server.
 - `apps/web/src/styles.css` and `apps/macos/Sources/Design/DesignTokens.swift` adapt the shared tokens to each client.
 - Todo Trackr's domain language is defined in `CONTEXT.md` and remains authoritative for product terminology.
+
+## Visual foundation maintenance
+
+Keep Sage/dark/Normal defaults, precise 4px controls, 8px cards and 12px dialogs, and quiet semantic feedback. Preserve product layouts and existing glyphs. Keep a scalable SVG master and inspect 16/32px legibility plus 128/512px Retina quality. Use the neutral Graphite base independently of accent palettes. Shared adapters are generated or vendored from the exact public v1.4.1 source, never edited independently.
