@@ -9,7 +9,7 @@ const output = resolve("dist/releases");
 await mkdir(output, { recursive: true });
 const staging = await mkdtemp(join(tmpdir(), "todo-trackr-server-"));
 try {
-  for (const file of ["package.json", "package-lock.json", "release.json", "LICENSE", "SECURITY.md", "CONTRIBUTING.md", "CONTEXT.md", "CHANGELOG.md", ".env.self-hosted.example", "database", "docs", "design/GEIST-LICENSE.txt", "scripts/migrate-database.mjs", "scripts/hash-password.mjs", "dist/server.mjs", "apps/web/package.json"]) {
+  for (const file of ["package.json", "package-lock.json", "vendor/packages", "release.json", "LICENSE", "SECURITY.md", "CONTRIBUTING.md", "CONTEXT.md", "CHANGELOG.md", ".env.self-hosted.example", "database", "docs", "design/GEIST-LICENSE.txt", "scripts/migrate-database.mjs", "scripts/hash-password.mjs", "dist/server.mjs", "apps/web/package.json"]) {
     await mkdir(resolve(staging, file, ".."), { recursive: true });
     await cp(file, join(staging, file), { recursive: true });
   }
