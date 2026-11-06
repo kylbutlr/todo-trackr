@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
+const controls = readFileSync(new URL("../design/app-stylr-controls.css", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../apps/web/src/styles.css", import.meta.url), "utf8");
 
 describe("Task toolbar styles", () => {
@@ -11,9 +12,10 @@ describe("Task toolbar styles", () => {
     expect(styles).toMatch(/\.task-tools\s*>\s*select\s*\{[^}]*flex:\s*0 1 240px/u);
   });
 
-  it("insets custom select carets from the right border", () => {
-    expect(styles).toMatch(/\.task-tools select\s*\{[^}]*appearance:\s*none/u);
-    expect(styles).toMatch(/\.task-tools select\s*\{[^}]*padding-right:\s*(?:3[2-9]|[4-9]\d)px/u);
-    expect(styles).toMatch(/\.task-tools select\s*\{[^}]*background-position:\s*right 14px center/u);
+  it("uses the shared picker treatment without a competing toolbar caret", () => {
+    expect(styles).toContain('@import "../../../design/app-stylr-controls.css"');
+    expect(styles).not.toMatch(/\.task-tools select\s*\{[^}]*background-image/u);
+    expect(controls).toMatch(/background-position:\s*right 12px center/u);
+    expect(controls).toMatch(/select::picker-icon\s*\{[^}]*margin-inline-end:\s*0/u);
   });
 });
