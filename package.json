@@ -1,6 +1,6 @@
 {
   "name": "todo-tracker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -51,19 +51,19 @@
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.11",
     "@electric-sql/pglite-socket": "^0.2.14",
-    "@trigger.dev/build": "^4.7.7",
     "@types/node": "^26.2.0",
     "@types/pg": "^8.23.1",
     "@types/web-push": "^3.6.4",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10",
+    "vitest": "^4.1.12",
     "app-stylr": "file:vendor/packages/app-stylr-1.4.1.tgz"
   },
   "license": "MIT",
   "overrides": {
     "engine.io-client": {
       "ws": "^8.21.0"
-    }
+    },
+    "sharp": "0.35.5"
   }
 }

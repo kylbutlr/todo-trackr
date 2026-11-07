@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 1.1.1
+
+- Update Vitest within v4 and remove the unused Trigger build helper from development dependencies. The SDK and optional hosted integration remain unchanged.
+
+- Patch development image tooling while retaining the exact App Stylr visual-source pin.
 
 - Add labeled phone navigation for task views, custom lists, enabled sources, and settings.
 - Keep phone task saving and conflict feedback in the sticky editor header, with a shorter notes area.
