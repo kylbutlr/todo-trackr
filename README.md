@@ -12,7 +12,7 @@ Todo Trackr is open-source under the [MIT license](LICENSE). Run one workspace o
 
 ## Public release
 
-The visual refresh targets **v1.1.0**, distributed through [GitHub Releases](https://github.com/kylbutlr/todo-trackr/releases). It updates the shared foundation, Graphite artwork, task-filter layout and interface previews. The [release plan](docs/self-hosted-release-plan.md) documents the standalone distribution model. Installed-extension acceptance is separate from the source checks and visual captures.
+Download the compiled server, source, and Quick Capture extension from [GitHub Releases](https://github.com/kylbutlr/todo-trackr/releases/latest). Releases include SHA-256 checksums. The Mac companion is provided as source, not as a prebuilt download. Installed-client acceptance is separate from source checks and interface previews.
 
 Start with the [self-hosting guide](docs/self-hosting.md). Password protection is enabled by default. Local or privately secured installations can explicitly select passwordless access. Missing credentials never enable passwordless access.
 
@@ -36,6 +36,15 @@ The web app can also be added to a mobile home screen. Remote connections requir
 ## Installation and clients
 
 Follow [self-hosting](docs/self-hosting.md) for configuration, startup, backup, upgrade, and password modes. The standalone server serves both the web app and API and runs database-backed alarm scheduling. It does not require Netlify, Neon, or Trigger.dev.
+
+For a fresh installation, use the source archive and the guide's Docker Compose
+path, or choose the compiled server archive if you already manage PostgreSQL.
+Start the server and open its web workspace before connecting optional clients.
+
+On phones, **View or list** provides labeled navigation between task views,
+named lists, and System health. Task details keep **Save changes** at the top as
+you scroll, with a shorter notes field. Desktop navigation and editing retain
+their existing layout.
 
 In the Mac app or extension, enter your server origin and connect. See the [extension instructions](apps/browser-extension/README.md) for browser permissions, capture shortcuts, and manual updates. Native source-build and guarded local installation instructions are in [macOS installation](docs/macos-installation.md). The public release does not distribute a prebuilt Mac app or signed update feed. Source-built apps use manual updates.
 

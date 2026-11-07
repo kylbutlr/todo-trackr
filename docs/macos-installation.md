@@ -20,7 +20,7 @@ The installer checks the application identifier, numeric version and build numbe
 
 The complete candidate is copied and verified in a staging directory before the existing app moves. A dated backup is retained in the installation directory. If the final move fails, the original is restored. No user preferences or app data are removed. The installer serializes its own runs with a lock directory; a stale lock requires inspection, not automatic deletion.
 
-These safeguards apply to the supported installer. Finder replacement, `ditto`, or other manual copy commands bypass it and must not be used for installation. Always inspect the installed version before replacing it. A future prebuilt binary/Sparkle distribution would require its own signing, notarization, archive provenance, and appcast acceptance. It is outside the v1.0.0 source-only Mac distribution.
+These safeguards apply to the supported installer. Finder replacement, `ditto`, or other manual copy commands bypass it and must not be used for installation. Always inspect the installed version before replacing it. A future prebuilt binary/Sparkle distribution would require its own signing, notarization, archive provenance, and appcast acceptance. It is outside the current source-only Mac distribution.
 
 Run `npm run test:macos-install` to exercise downgrade prevention and failure recovery with disposable app fixtures. Tests never replace or quit an installed app.
 

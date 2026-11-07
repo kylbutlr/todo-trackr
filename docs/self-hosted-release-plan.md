@@ -1,5 +1,11 @@
 # Self-hosted release plan
 
+Historical planning record, October 22, 2026. The status and version targets below
+describe the initial preparation, not current availability. Server, source, and
+extension downloads are now available through [GitHub Releases](https://github.com/kylbutlr/todo-trackr/releases).
+For current installation and distribution guidance, use the [README](../README.md)
+and [self-hosting guide](self-hosting.md). The Mac companion remains source only.
+
 Status: self-hosted foundation implemented locally; release verification incomplete. Updated October 22, 2026.
 
 The public version and GitHub tag target are **v1.0.0**. All client/package metadata uses 1.0.0; the native build number is 1000000. The Mac app is distributed as source only, per the clarified release scope. A paid Apple membership, prebuilt Mac download, and notarization are not required. No public release or tag has been created.

@@ -442,6 +442,10 @@ function TaskDetail({ task, lists, compact = false, onSave, onDelete, onClose, o
           {!compact ? <button aria-label="Close task details" className="icon-button detail-close" onClick={onClose} type="button"><Icon name="close" /></button> : null}
           {!sourceManaged ? <button aria-label="Delete task" className="icon-button danger" onClick={onDelete} type="button"><Icon name="trash" /></button> : null}
         </div>
+        <button className="primary-button mobile-detail-save" disabled={!title.trim() || saving} type="submit">
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+        {saveError ? <p className="detail-conflict mobile-save-feedback" role="alert">{saveError}</p> : null}
       </div>
       <label htmlFor="task-title">Title</label>
       <input disabled={sourceManaged} id="task-title" onChange={(event) => setDraft((current) => ({ ...current, dirty: true, title: event.target.value }))} value={title} />
@@ -586,7 +590,7 @@ function TaskDetail({ task, lists, compact = false, onSave, onDelete, onClose, o
         </div>
       </div>
 
-      {saveError ? <p className="detail-conflict" role="alert">{saveError}</p> : null}
+      {saveError ? <p className="detail-conflict desktop-save-feedback" role="alert">{saveError}</p> : null}
 
       <button className="primary-button detail-save" disabled={!title.trim() || saving} type="submit">
         {saving ? "Saving…" : "Save changes"}
@@ -1755,6 +1759,33 @@ function Workspace({ onLogout }: { onLogout: () => void }) {
             : <span className="access-status" title="Anyone who can reach this server can access its tasks.">No password</span>}
         </div>
       </aside>
+
+      {isMobileViewport ? <nav className="mobile-navigation" aria-label="Workspace navigation">
+        <label htmlFor="mobile-workspace-view">View or list</label>
+        <select id="mobile-workspace-view" value={workspaceMode === 'shortcut' && !isConnectionView(view) ? 'board:shortcut' : view}
+          onChange={(event) => event.target.value === 'board:shortcut' ? showShortcutBoard() : selectView(event.target.value as ViewKey)}>
+          <optgroup label="Task views">
+            {smartViews.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+          </optgroup>
+          <optgroup label="My lists">
+            {lists.filter((list) => !list.isInbox).map((list) => <option key={list.id} value={`list:${list.id}`}>{list.name}</option>)}
+          </optgroup>
+          {(installation.integrations.shortcut || installation.integrations.granola) ? <optgroup label="Sources">
+            {installation.integrations.shortcut ? <option value="source:shortcut">Shortcut tasks</option> : null}
+            {installation.integrations.granola ? <option value="source:granola">Granola tasks</option> : null}
+            <option value="source:slack">Slack tasks</option>
+          </optgroup> : null}
+          <optgroup label="Settings">
+            {installation.integrations.shortcut ? <>
+              <option value="board:shortcut">Shortcut board</option>
+              <option value="connection:shortcut">Shortcut setup</option>
+            </> : null}
+            {installation.integrations.granola ? <option value="connection:granola">Granola setup</option> : null}
+            {installation.integrations.codex ? <option value="connection:codex">Codex setup</option> : null}
+            <option value="connection:system">System health</option>
+          </optgroup>
+        </select>
+      </nav> : null}
 
       <div
         aria-live="polite"
