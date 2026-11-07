@@ -58,7 +58,7 @@
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10",
-    "app-stylr": "https://github.com/kylbutlr/app-stylr/archive/refs/tags/v1.4.1.tar.gz"
+    "app-stylr": "file:vendor/packages/app-stylr-1.4.1.tgz"
   },
   "license": "MIT",
   "overrides": {
