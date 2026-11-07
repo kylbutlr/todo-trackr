@@ -2,7 +2,18 @@
 
 Todo Trackr runs one owner's workspace per installation. The standalone runtime serves the web app and API, connects to PostgreSQL, and scans persistent task alarms every 15 seconds. The Mac app and extension connect to that same server.
 
-This implementation is under release validation. The embedded-database tests cover migrations, task editing, conflicts, recovery, alarms, and protected/passwordless sessions. The Docker/PostgreSQL rehearsal also covers both password modes, real concurrent-edit conflicts, restart recovery, and database dump/restore. A real installed-extension review remains outstanding. Mac distribution is source only, without a paid Apple membership or a binary update feed.
+Server, source, and extension archives are available through [GitHub Releases](https://github.com/kylbutlr/todo-trackr/releases/latest). The embedded-database tests cover migrations, task editing, conflicts, recovery, alarms, and protected/passwordless sessions. The recorded Docker/PostgreSQL rehearsal also covers both password modes, real concurrent-edit conflicts, restart recovery, and database dump/restore. A real installed-extension review remains outstanding. Mac distribution is source only, without a paid Apple membership or a binary update feed.
+
+## Choose an installation
+
+- **Source archive with Docker Compose:** start here for a fresh installation;
+  the source includes the Dockerfile, Compose configuration, and build tooling.
+- **Compiled server archive:** use this if you already have PostgreSQL. It
+  includes the web workspace, API, and migrations, with no build step required.
+- **Optional clients:** connect Quick Capture or build the Mac companion after
+  the web workspace works. Neither is needed to manage tasks in the browser.
+
+Verify the download against its release's `SHA256SUMS` file before extracting.
 
 ## Requirements
 
@@ -17,6 +28,10 @@ From your checkout:
 ```bash
 cp .env.self-hosted.example .env.self-hosted
 ```
+
+For an existing installation, keep its current environment file and back it up;
+do not overwrite it with the example. On a clean download, copy the example only
+when `.env.self-hosted` does not already exist.
 
 The completed file is ignored by Git. Set a unique hexadecimal `POSTGRES_PASSWORD`; hexadecimal avoids URL-encoding ambiguity in Compose's database connection string. Generate it locally:
 

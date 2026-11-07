@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Add labeled phone navigation for task views, custom lists, enabled sources, and settings.
+- Keep phone task saving and conflict feedback in the sticky editor header, with a shorter notes area.
+- Update Zod and the locked systeminformation resolution to clear runtime dependency advisories.
+- Refresh installation, extension, packaging, and source-only Mac documentation.
+
 ## 1.1.0
 
 - Pin the shared visual foundation to App Stylr v1.4.1, with charcoal surfaces, Sage accents and precise controls.
