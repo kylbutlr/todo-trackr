@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased
+## 1.1.1
+
+- Resume Quick Capture server setup after Chrome closes the popup for its native site-access prompt, without repeating the server URL or Connect action.
+
+- Make native-source verification work in downloaded source archives without Git metadata, while preserving checkout digests and excluding local build/editor state.
+
+- Update Vitest within v4 and remove the unused Trigger build helper from development dependencies. The SDK and optional hosted integration remain unchanged.
+
+- Patch development image tooling while retaining the exact App Stylr visual-source pin.
 
 - Add labeled phone navigation for task views, custom lists, enabled sources, and settings.
 - Keep phone task saving and conflict feedback in the sticky editor header, with a shorter notes area.

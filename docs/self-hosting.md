@@ -2,7 +2,7 @@
 
 Todo Trackr runs one owner's workspace per installation. The standalone runtime serves the web app and API, connects to PostgreSQL, and scans persistent task alarms every 15 seconds. The Mac app and extension connect to that same server.
 
-Server, source, and extension archives are available through [GitHub Releases](https://github.com/kylbutlr/todo-trackr/releases/latest). The embedded-database tests cover migrations, task editing, conflicts, recovery, alarms, and protected/passwordless sessions. The recorded Docker/PostgreSQL rehearsal also covers both password modes, real concurrent-edit conflicts, restart recovery, and database dump/restore. A real installed-extension review remains outstanding. Mac distribution is source only, without a paid Apple membership or a binary update feed.
+Server, source, and extension archives are available through [GitHub Releases](https://github.com/kylbutlr/todo-trackr/releases/latest). The embedded-database tests cover migrations, task editing, conflicts, recovery, alarms, and protected/passwordless sessions. The v1.1.1 Docker/PostgreSQL rehearsal also covers both password modes, real concurrent-edit conflicts, restart recovery, and database dump/restore. Installed Quick Capture acceptance covers native server-permission approval, setup recovery when Chrome closes the popup, page-title and source-URL capture, and disconnect cleanup. Mac distribution is source only, without a paid Apple membership or a binary update feed. See the [versioned verification record](release-verification-v1.1.1.md) for scope and remaining device-specific limits.
 
 ## Choose an installation
 
