@@ -13,6 +13,9 @@ The Manifest V3 extension captures selected webpage text as a task in your Todo 
 
 Use the extension ZIP from a published [GitHub release](https://github.com/kylbutlr/todo-trackr/releases/latest), verify its SHA-256 checksum, and follow that release's compatibility notes. A locally built ZIP contains source changes that may not yet be included in the public download.
 
+Chrome may close the popup after you approve server access. Reopen Todo Trackr;
+setup resumes automatically without entering the address or choosing Connect again.
+
 Change the shortcut at `chrome://extensions/shortcuts` if another extension uses it. Browser-internal pages and other restricted pages cannot be captured. On Slack web, capture uses a selected message permalink when the page markup exposes one, otherwise the current conversation URL.
 
 ## Update manually

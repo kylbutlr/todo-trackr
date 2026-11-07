@@ -9,7 +9,22 @@ export function normalizeServerURL(value) {
 }
 
 export async function connection() {
-  const values = await chrome.storage.local.get(["connection", "sessionToken"]);
+  let values = await chrome.storage.local.get(["connection", "sessionToken", "pendingServerOrigin"]);
+  if (values.pendingServerOrigin) {
+    const origin = normalizeServerURL(values.pendingServerOrigin);
+    if (await chrome.permissions.contains({ origins: [`${origin}/*`] })) {
+      const settings = await serverSettings(origin);
+      const current = await chrome.storage.local.get(["pendingServerOrigin", "connection"]);
+      // Disconnect or another setup may have superseded this request while fetching.
+      if (current.pendingServerOrigin !== origin) return connection();
+      if (current.connection?.origin !== origin || settings.authenticationMode === "none") {
+        await chrome.storage.local.remove("sessionToken");
+      }
+      await chrome.storage.local.set({ connection: { origin, authenticationMode: settings.authenticationMode } });
+    }
+    await chrome.storage.local.remove("pendingServerOrigin");
+    values = await chrome.storage.local.get(["connection", "sessionToken"]);
+  }
   if (values.connection) return { ...values.connection, token: values.sessionToken };
   if (values.sessionToken) return { origin: "https://todotrackr.netlify.app", authenticationMode: "password", token: values.sessionToken };
   return undefined;

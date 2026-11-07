@@ -43,13 +43,15 @@ document.querySelector("#connection-form").addEventListener("submit", async (eve
   button.disabled = true;
   try {
     const origin = normalizeServerURL(serverURL.value);
-    const granted = await chrome.permissions.request({ origins: [`${origin}/*`] });
-    if (!granted) throw new Error("Server permission was declined. Choose Connect to try again.");
-    const settings = await serverSettings(origin);
-    const previous = await connection();
-    if (previous?.origin !== origin || settings.authenticationMode === "none") await chrome.storage.local.remove("sessionToken");
-    selected = { origin, authenticationMode: settings.authenticationMode };
-    await chrome.storage.local.set({ connection: selected });
+    // Chrome may close this popup when its native permission sheet is accepted.
+    // Persist the intended destination, without awaiting before the user-gesture API.
+    const pending = chrome.storage.local.set({ pendingServerOrigin: origin });
+    const permission = chrome.permissions.request({ origins: [`${origin}/*`] });
+    await pending;
+    if (!await permission) {
+      await chrome.storage.local.remove("pendingServerOrigin");
+      throw new Error("Server permission was declined. Choose Connect to try again.");
+    }
     password.value = "";
     await restore();
   } catch (error) { status.textContent = error instanceof Error ? error.message : "Unable to connect."; }
@@ -95,7 +97,7 @@ document.querySelector("#open-app").addEventListener("click", () => {
 });
 
 document.querySelector("#sign-out").addEventListener("click", async () => {
-  await chrome.storage.local.remove(["sessionToken", "connection"]);
+  await chrome.storage.local.remove(["sessionToken", "connection", "pendingServerOrigin"]);
   selected = undefined;
   password.value = "";
   status.textContent = "Disconnected. This does not change the server’s access settings.";

@@ -2,6 +2,8 @@
 
 ## 1.1.1
 
+- Resume Quick Capture server setup after Chrome closes the popup for its native site-access prompt, without repeating the server URL or Connect action.
+
 - Make native-source verification work in downloaded source archives without Git metadata, while preserving checkout digests and excluding local build/editor state.
 
 - Update Vitest within v4 and remove the unused Trigger build helper from development dependencies. The SDK and optional hosted integration remain unchanged.
