@@ -4,7 +4,9 @@ Prepared November 7, 2026. Local release candidate only; no push, merge, tag, pu
 
 ## Verified checks
 
-The candidate includes labeled phone navigation, sticky Save/conflict feedback, and runtime dependency fixes. The unused @trigger.dev/build dependency was removed after confirming no source imports, eliminating its Prisma/deepmerge chain; the SDK remains unchanged. Vitest is updated within v4 and a narrow override patches sharp. The full dependency audit now reports zero findings. All 309 source tests, five isolated standalone tests, typecheck, version/native-distribution policy checks, web/server builds, packaging, and 93 native source tests passed. The extracted runtime installed with zero vulnerabilities and passed task editing, stale-write rejection, backup export, origin controls, disabled-integration defaults, and both authentication modes.
+The candidate includes labeled phone navigation, sticky Save/conflict feedback, and runtime dependency fixes. The unused @trigger.dev/build dependency was removed after confirming no source imports, eliminating its Prisma/deepmerge chain; the SDK remains unchanged. Vitest is updated within v4 and a narrow override patches sharp. The full dependency audit now reports zero findings. All 310 source tests, five isolated standalone tests, typecheck, version/native-distribution policy checks, web/server builds, packaging, and 93 native source tests passed. The extracted runtime installed with zero vulnerabilities and passed task editing, stale-write rejection, backup export, origin controls, disabled-integration defaults, and both authentication modes.
+
+A clean source extraction exposed a Git-only assumption in native-source verification. The regression failed before the fix and now passes using a filesystem fallback for archives, excluding generated/local state. The existing Git-checkout native digest is unchanged. The rebuilt source archive still needs its separate clean-install verification before publication.
 
 ## Limits and publication
 

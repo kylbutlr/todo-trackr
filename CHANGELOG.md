@@ -2,6 +2,8 @@
 
 ## 1.1.1
 
+- Make native-source verification work in downloaded source archives without Git metadata, while preserving checkout digests and excluding local build/editor state.
+
 - Update Vitest within v4 and remove the unused Trigger build helper from development dependencies. The SDK and optional hosted integration remain unchanged.
 
 - Patch development image tooling while retaining the exact App Stylr visual-source pin.
