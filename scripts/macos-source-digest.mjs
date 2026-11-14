@@ -5,10 +5,11 @@ import { readFile, readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import process from "node:process";
+import { buildProfile } from "./build-profile.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 
-async function nativeSourceFiles(root) {
+async function nativeSourceFiles(root, profile) {
   if (!existsSync(path.join(root, ".git"))) {
     // Downloaded source archives have no Git index. Ignore generated/local state
     // using the same native-source exclusions as the repository's .gitignore.
@@ -22,7 +23,7 @@ async function nativeSourceFiles(root) {
         const relativePath = `${relativeDirectory}/${entry.name}`;
         if (entry.isSymbolicLink()) throw new Error(`Unexpected symlink in native source archive: ${relativePath}`);
         if (entry.isDirectory()) {
-          if (!ignoredDirectories.has(entry.name)) await walk(relativePath);
+          if (!ignoredDirectories.has(entry.name) && !entry.name.startsWith(".build-") && (entry.name !== "Personal" || profile === "personal")) await walk(relativePath);
         } else if (entry.isFile()
           && entry.name !== ".DS_Store"
           && !/\.(xcuserstate|tsbuildinfo|log)$/.test(entry.name)
@@ -34,7 +35,7 @@ async function nativeSourceFiles(root) {
     await walk("apps/macos");
     return files.sort();
   }
-  return execFileSync(
+  const publicFiles = execFileSync(
     "git",
     ["ls-files", "--cached", "--others", "--exclude-standard", "apps/macos"],
     { cwd: root, encoding: "utf8" },
@@ -42,11 +43,24 @@ async function nativeSourceFiles(root) {
     .trim()
     .split("\n")
     .filter((relativePath) => relativePath && existsSync(path.join(root, relativePath)))
+    .filter(file => !file.startsWith("apps/macos/Personal/"))
     .sort();
+  if (profile !== "personal") return publicFiles;
+  const privateFiles = [];
+  async function walkPersonal(directory) {
+    for (const entry of await readdir(path.join(root, directory), { withFileTypes: true })) {
+      const file = `${directory}/${entry.name}`;
+      if (entry.isSymbolicLink()) throw new Error("Unexpected symlink in personal source");
+      if (entry.isDirectory()) await walkPersonal(file);
+      else if (entry.isFile()) privateFiles.push(file);
+    }
+  }
+  await walkPersonal("apps/macos/Personal");
+  return [...publicFiles, ...privateFiles].sort();
 }
 
-export async function nativeSourceDigest(root = repositoryRoot) {
-  const files = await nativeSourceFiles(root);
+export async function nativeSourceDigest(root = repositoryRoot, profile = buildProfile()) {
+  const files = await nativeSourceFiles(root, profile);
   const hash = createHash("sha256");
   const relativeFiles = [];
   for (const relativePath of files) {

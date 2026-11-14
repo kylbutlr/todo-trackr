@@ -11,17 +11,20 @@ final class MiniDashboardWindowController {
     private let panelFactory: (() -> NSPanel)?
     private let activateApplication: () -> Void
     private let defaults: UserDefaults
+    private let workIntegration: WorkIntegration?
     private var panel: NSPanel?
 
     init(
         store: TaskStore,
         workspaceWindowController: WorkspaceWindowController,
+        workIntegration: WorkIntegration? = nil,
         defaults: UserDefaults = .standard,
         activateApplication: @escaping () -> Void = {
             NSApp.activate(ignoringOtherApps: true)
         }
     ) {
         self.store = store
+        self.workIntegration = workIntegration
         self.workspaceWindowController = workspaceWindowController
         panelFactory = nil
         self.defaults = defaults
@@ -35,6 +38,7 @@ final class MiniDashboardWindowController {
         activateApplication: @escaping () -> Void = {}
     ) {
         store = nil
+        workIntegration = nil
         workspaceWindowController = nil
         self.panelFactory = panelFactory
         self.defaults = defaults
@@ -101,6 +105,7 @@ final class MiniDashboardWindowController {
             }
         )
         .environmentObject(store)
+        .environmentObject(workIntegration ?? WorkIntegration())
         .font(DesignTokens.sans(14))
         .preferredColorScheme(.dark)
 

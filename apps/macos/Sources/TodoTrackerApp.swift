@@ -39,12 +39,20 @@ struct TodoTrackerApp: App {
     private let miniDashboardWindowController: MiniDashboardWindowController
     private let menuBarController: MenuBarController
     private let updatesEnabled: Bool
+    private let workIntegration: WorkIntegration
 
     init() {
         FontRegistration.registerBundledFonts()
         let store = TaskStore()
+        let workIntegration = WorkIntegrationFactory.make(store: store)
+        store.setBackgroundAutomaticWorkDemandProvider { [weak workIntegration] in workIntegration?.wantsAutomaticRefresh == true }
+        self.workIntegration = workIntegration
+        store.setShortcutWorkPermissionProvider { [weak workIntegration, weak store] in
+            let mode = WorkProviderRouting.miniMode(UserDefaults.standard.string(forKey: "todo-trackr.workspace-mode") ?? "tasks", shortcutAvailable: store?.installation.integrations.shortcut == true)
+            return WorkProviderRouting.permitsShortcut(mode: mode, hasIntegrationScope: workIntegration?.hasSavedScope == true)
+        }
         let quickCaptureController = GlobalQuickCaptureController()
-        let workspaceWindowController = WorkspaceWindowController(store: store)
+        let workspaceWindowController = WorkspaceWindowController(store: store, workIntegration: workIntegration)
         let shouldEnableUpdates = Bundle.main.bundleURL.pathExtension == "app"
             && Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil
         let updaterController = SPUStandardUpdaterController(
@@ -60,7 +68,8 @@ struct TodoTrackerApp: App {
         self.workspaceWindowController = workspaceWindowController
         let miniDashboardWindowController = MiniDashboardWindowController(
             store: store,
-            workspaceWindowController: workspaceWindowController
+            workspaceWindowController: workspaceWindowController,
+            workIntegration: workIntegration
         )
         self.miniDashboardWindowController = miniDashboardWindowController
         store.setTaskSurfaceVisibilityProvider {
@@ -74,11 +83,13 @@ struct TodoTrackerApp: App {
             miniDashboardWindowController: miniDashboardWindowController,
             quickCaptureController: quickCaptureController,
             checkForUpdates: { updaterController.checkForUpdates(nil) },
-            updatesEnabled: shouldEnableUpdates
+            updatesEnabled: shouldEnableUpdates,
+            workIntegration: workIntegration
         )
         self.menuBarController = menuBarController
         AppDelegate.onDidFinishLaunching = {
             menuBarController.start()
+            Task { await workIntegration.startAutomaticRefresh() }
         }
         AppDelegate.onShouldReopen = { workspaceWindowController.open() }
     }
@@ -87,6 +98,7 @@ struct TodoTrackerApp: App {
         WindowGroup("Todo Trackr", id: "workspace") {
             ContentView()
                 .environmentObject(store)
+                .environmentObject(workIntegration)
                 .font(DesignTokens.sans(14))
                 .preferredColorScheme(.dark)
                 .frame(minWidth: 380, minHeight: 620)
@@ -101,6 +113,16 @@ struct TodoTrackerApp: App {
                     updaterController.checkForUpdates(nil)
                 }
                 .disabled(!updatesEnabled)
+            }
+            CommandGroup(after: .importExport) {
+                Button("Open Mini Trackr") { miniDashboardWindowController.open() }
+                if store.installation.integrations.shortcut {
+                    Button("Shortcut connection…") { ShortcutConnectionWindow.show() }
+                }
+                if workIntegration.isAvailable {
+                    Button("Import \(workIntegration.title) metadata…") { workIntegration.chooseFile() }
+                    Button("\(workIntegration.title)…") { workIntegration.show() }
+                }
             }
         }
 

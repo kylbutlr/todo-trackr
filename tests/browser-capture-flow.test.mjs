@@ -5,7 +5,8 @@ afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals()
 async function captureFixture(selected) {
   vi.resetModules(); vi.useFakeTimers();
   const chrome = {
-    runtime: { getURL: (path) => `chrome-extension://fixture/${path}`, onMessage: { addListener: vi.fn() } },
+    runtime: { getURL: (path) => `chrome-extension://fixture/${path}`, onMessage: { addListener: vi.fn() }, onStartup: {addListener:vi.fn()} },
+    permissions: {onAdded:{addListener:vi.fn()},onRemoved:{addListener:vi.fn()}},
     commands: { onCommand: { addListener: vi.fn() } },
     storage: { local: { get: vi.fn().mockResolvedValue(selected), remove: vi.fn().mockResolvedValue() } },
     tabs: { query: vi.fn().mockResolvedValue([{ id: 1, url: "https://example.test/article" }]) },
@@ -15,7 +16,7 @@ async function captureFixture(selected) {
   };
   const fetcher = vi.fn().mockResolvedValue(Response.json({ task: { id: "fixture" } }, { status: 201 }));
   vi.stubGlobal("chrome", chrome); vi.stubGlobal("fetch", fetcher);
-  await import("../apps/browser-extension/background.js");
+  await import("../apps/browser-extension-public/background.js");
   const listener = chrome.runtime.onMessage.addListener.mock.calls[0][0];
   return { chrome, fetcher, capture: () => new Promise((done) => listener({ type: "quick-capture" }, {}, done)) };
 }

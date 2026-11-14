@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MiniDashboardView: View {
     @EnvironmentObject private var store: TaskStore
+    @EnvironmentObject private var integration: WorkIntegration
     @AppStorage("todo-trackr.mini-dashboard.starred-only") private var starredOnly = false
     @AppStorage("todo-trackr.workspace-mode") private var workspaceModeRaw = WorkspaceMode.tasks.rawValue
     @AppStorage("todo-trackr.shortcut-board.scope") private var shortcutScopeRaw = ShortcutBoardScope.either.rawValue
@@ -44,7 +45,7 @@ struct MiniDashboardView: View {
     }
 
     private var workspaceMode: WorkspaceMode {
-        store.installation.integrations.shortcut ? (WorkspaceMode(rawValue: workspaceModeRaw) ?? .tasks) : .tasks
+        WorkProviderRouting.miniMode(workspaceModeRaw, shortcutAvailable: store.installation.integrations.shortcut)
     }
 
     private var shortcutScope: ShortcutBoardScope {
@@ -70,7 +71,7 @@ struct MiniDashboardView: View {
     }
 
     private var isRefreshingVisibleSurface: Bool {
-        isManualRefreshInFlight || (workspaceMode == .tasks ? store.isLoading : isShortcutFeedLoading)
+        isManualRefreshInFlight || (workspaceMode == .integration ? integration.isRefreshing : workspaceMode == .tasks ? store.isLoading : isShortcutFeedLoading)
     }
 
     private var canRefresh: Bool {
@@ -93,13 +94,18 @@ struct MiniDashboardView: View {
                 case .signedOut:
                     signedOutContent
                 case .signedIn:
-                    signedInContent
+                    Group {
+                        if workspaceMode == .integration { integration.miniView() }
+                        else { signedInContent }
+                    }
                         .clipped()
-                    if store.installation.integrations.shortcut { MiniDashboardSyncFooter(schedule: store.shortcutSync,
+                    if workspaceMode == .integration { integration.footerView() }
+                    else if store.shortcutWorkEnabled { MiniDashboardSyncFooter(schedule: store.shortcutSync,
                                             workSwitchStatus: store.workSwitchStatus,
                                             isVisible: { store.isTaskSurfaceVisible },
                                             sync: { await store.syncShortcutAndReload() }) } else {
-                        SyncStatusView(state: store.syncState).padding(8)
+                        Text(!integration.hasSavedScope ? "Task updates" : "Shortcut timer paused on this Mac")
+                            .font(DesignTokens.sans(11)).foregroundStyle(DesignTokens.textMuted).padding(8)
                     }
                 }
             }
@@ -120,19 +126,7 @@ struct MiniDashboardView: View {
 
     private var header: some View {
         HStack(spacing: 8) {
-            if store.installation.integrations.shortcut { Button(action: toggleWorkspaceMode) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(DesignTokens.selected)
-                    Image(systemName: workspaceMode.systemImage)
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(DesignTokens.action)
-                }
-                .frame(width: 30, height: 30)
-            }
-            .buttonStyle(.plain)
-            .help(workspaceMode == .tasks ? "Showing Tasks. Switch to Shortcut" : "Showing Shortcut. Switch to Tasks")
-            .accessibilityLabel(workspaceMode == .tasks ? "Showing Tasks. Switch to Shortcut" : "Showing Shortcut. Switch to Tasks") }
+            MiniWorkspacePicker(selectedMode: $workspaceModeRaw, shortcutAvailable: store.installation.integrations.shortcut)
 
             Text("Mini Trackr")
                 .font(DesignTokens.sans(16, weight: .bold))
@@ -162,15 +156,15 @@ struct MiniDashboardView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(isRefreshingVisibleSurface ? DesignTokens.action : DesignTokens.textMuted)
-                .disabled(!canRefresh || isManualRefreshInFlight)
-                .help(workspaceMode == .tasks ? "Sync Shortcut and refresh Tasks" : "Refresh Shortcut")
+                .disabled(!canRefresh || isManualRefreshInFlight || (workspaceMode == .integration && !integration.canRefresh))
+                .help(refreshLabel)
                 .accessibilityLabel(
                     isRefreshingVisibleSurface
                         ? "Refreshing Mini Trackr"
-                        : workspaceMode == .tasks ? "Sync Shortcut and refresh Tasks" : "Refresh Shortcut"
+                        : refreshLabel
                 )
 
-                Button {
+                if workspaceMode != .integration { Button {
                     withAnimation(.easeInOut(duration: 0.16)) {
                         starredOnly.toggle()
                     }
@@ -185,7 +179,7 @@ struct MiniDashboardView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(starredOnly ? DesignTokens.warning : DesignTokens.textMuted)
                 .help(starredOnly ? "Show all items" : "Show only Starred items")
-                .accessibilityLabel(starredOnly ? "Show all items" : "Show only Starred items")
+                .accessibilityLabel(starredOnly ? "Show all items" : "Show only Starred items") }
 
                 Button {
                     alwaysOnTop.toggle()
@@ -502,19 +496,15 @@ struct MiniDashboardView: View {
         }
     }
 
-    private func toggleWorkspaceMode() {
-        let nextMode: WorkspaceMode = workspaceMode == .tasks ? .shortcut : .tasks
-        workspaceModeRaw = nextMode.rawValue
-        store.selectedTaskID = nil
-        store.selectedShortcutStoryReference = nil
-        collapseQuickAdd()
-        if nextMode == .shortcut {
-            isShortcutFeedStarting = true
-        }
+    private var refreshLabel: String {
+        if workspaceMode == .integration { return "Refresh \(integration.title) current Work" }
+        if workspaceMode == .shortcut { return "Refresh Shortcut" }
+        return store.shortcutWorkEnabled ? "Sync Shortcut and refresh Tasks" : "Refresh Tasks"
     }
 
     private func refreshMiniDashboard() {
         guard canRefresh, !isManualRefreshInFlight else { return }
+        if workspaceMode == .integration { integration.refresh(); return }
         isManualRefreshInFlight = true
         Task { @MainActor in
             defer { isManualRefreshInFlight = false }

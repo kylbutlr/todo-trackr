@@ -32,8 +32,20 @@ def metadata(bundle):
         raise ValueError(f"Cannot verify version metadata in {bundle}: {error}") from error
 
 
+def build_profile(bundle):
+    with (bundle / "Contents/Info.plist").open("rb") as file:
+        info = plistlib.load(file)
+    # Pre-split private installations are recognizable without reading user data.
+    has_receiver = (bundle / "Contents/MacOS/RadarNativeHost").exists()
+    profile = info.get("TodoTrackrBuildProfile", "personal" if has_receiver else "public")
+    if profile not in ("public", "personal") or (profile == "public" and has_receiver):
+        raise ValueError("Invalid Todo Trackr build profile; existing app was not changed.")
+    return profile
+
+
 def check_versions(candidate, installed_paths):
     candidate_version, candidate_build, candidate_label = metadata(candidate)
+    candidate_profile = build_profile(candidate)
     expected_build = candidate_version[0] * 1_000_000 + candidate_version[1] * 1_000 + candidate_version[2]
     if any(part > 999 for part in candidate_version) or candidate_build != expected_build:
         raise ValueError("Candidate version and build do not follow Todo Trackr's release numbering.")
@@ -41,6 +53,8 @@ def check_versions(candidate, installed_paths):
         if not installed.exists():
             continue
         version, build, label = metadata(installed)
+        if candidate_profile != build_profile(installed):
+            raise ValueError("Refusing to replace a different Todo Trackr build profile. Public and personal histories must be migrated explicitly; existing app was not changed.")
         if candidate_version < version or candidate_build < build:
             raise ValueError(f"Refusing downgrade: candidate {candidate_label} ({candidate_build}) is older than {installed.name} {label} ({build}). Existing app was not changed.")
         if candidate_version == version or candidate_build == build:

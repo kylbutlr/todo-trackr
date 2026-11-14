@@ -10,3 +10,25 @@ apps/macos/.build
 .trigger
 coverage
 *.log
+# Owner-only integrations never enter the public Docker build context.
+personal
+apps/macos/Personal
+apps/macos/.build-*
+apps/web/dist-personal
+apps/browser-extension/radar*
+apps/browser-extension/manifest.json
+apps/browser-extension/background.js
+apps/browser-extension/popup.html
+apps/browser-extension/README.md
+docs/radar*
+hosting
+integrations
+scripts/radar*
+scripts/register-radar-native-host.py
+scripts/check-radar-macos-closed.sh
+scripts/test-radar-macos-delivery.mjs
+scripts/preview-work-providers.mjs
+tests/radar*
+tests/test_radar_native_registration.py
+tests/work-provider-safety.test.ts
+vitest.radar*

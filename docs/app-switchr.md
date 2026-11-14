@@ -52,3 +52,5 @@ cd apps/macos && swift test --disable-sandbox
 ```
 
 The App Switchr repository also provides a real local HTTP contract test accepting this checkout's absolute path. Its service process and credentials are temporary, and it never connects to Neon.
+
+[Public and personal build profiles](build-profiles.md) describe the optional local integration boundary.

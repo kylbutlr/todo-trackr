@@ -4,4 +4,4 @@ export type NativeSourceDigest = {
   files: string[];
 };
 
-export function nativeSourceDigest(root?: string): Promise<NativeSourceDigest>;
+export function nativeSourceDigest(root?: string, profile?: "public" | "personal"): Promise<NativeSourceDigest>;

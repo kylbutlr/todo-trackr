@@ -28,5 +28,10 @@
     "scripts/**/*.mjs",
     "tests/**/*.ts",
     "server/**/*.ts"
+  ],
+  "exclude": [
+    "personal",
+    "tests/radar*",
+    "tests/work-provider-safety.test.ts"
   ]
 }

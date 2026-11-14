@@ -65,6 +65,15 @@ it("runs the generic capture/edit/recovery flow without integration credentials"
   expect(backup.tasks.some((item: { id: string }) => item.id === task.id)).toBe(true);
 });
 
+it("keeps private provider routes out of the standalone public installation", async () => {
+  const installation = await (await request("/api/installation")).json();
+  expect(installation.integrations).toEqual({ shortcut: false, granola: false, codex: false });
+  expect(installation.workSwitch).toBe(false);
+  for (const path of ["/api/connections/radar", "/api/connections/work-management"]) {
+    expect((await request(path)).status).toBe(404);
+  }
+});
+
 it("rolls back an entire transaction when a later statement fails", async () => {
   const sql = database();
   await expect(sql.transaction((tx) => [

@@ -3,6 +3,7 @@ import Foundation
 enum WorkspaceMode: String, CaseIterable, Identifiable {
     case tasks
     case shortcut
+    case integration
 
     var id: String { rawValue }
 
@@ -10,6 +11,7 @@ enum WorkspaceMode: String, CaseIterable, Identifiable {
         switch self {
         case .tasks: "Tasks"
         case .shortcut: "Shortcut"
+        case .integration: WorkIntegrationFactory.title
         }
     }
 
@@ -17,6 +19,7 @@ enum WorkspaceMode: String, CaseIterable, Identifiable {
         switch self {
         case .tasks: "checkmark"
         case .shortcut: "link"
+        case .integration: "link"
         }
     }
 }

@@ -47,6 +47,9 @@ final class TaskStore: ObservableObject {
     private let api: APIClient
     let shortcutSync = ShortcutSyncSchedule()
     private var shortcutSyncTimer: Task<Void, Never>?
+    private var permitsShortcutWork: @MainActor () -> Bool = { true }
+    var shortcutWorkEnabled: Bool { installation.integrations.shortcut && permitsShortcutWork() }
+    func setShortcutWorkPermissionProvider(_ provider: @escaping @MainActor () -> Bool) { permitsShortcutWork = provider }
 
     var isTaskSurfaceVisible: Bool { taskSurfaceVisibility() }
     var isSignedIn: Bool { authenticationState == .signedIn }
@@ -59,6 +62,8 @@ final class TaskStore: ObservableObject {
     private var unchangedTaskPolls = 0
     private var reviewWatchTask: Task<Void, Never>?
     private var taskSurfaceVisibility: @MainActor () -> Bool = { true }
+    private var backgroundAutomaticWorkDemand: @MainActor () -> Bool = { false }
+    func setBackgroundAutomaticWorkDemandProvider(_ provider: @escaping @MainActor () -> Bool) { backgroundAutomaticWorkDemand = provider }
 
     init(api: APIClient = .shared) {
         self.api = api
@@ -88,7 +93,7 @@ final class TaskStore: ObservableObject {
         Task { await checkWorkPermission() }
     }
 
-    private func checkWorkPermission() async {
+    private func checkWorkPermission(allowCatchUp: Bool = true) async {
         guard installation.usesWorkSwitch else {
             workSwitchStatus = nil
             api.activity?.setPermission(.unconfigured)
@@ -108,8 +113,8 @@ final class TaskStore: ObservableObject {
             workLeaseUptime = ProcessInfo.processInfo.systemUptime + remaining
             api.activity?.setPermission(!next.configured ? .unconfigured : next.state == "active" ? .active : next.state == "standby" ? .off : .unavailable, revision: next.revision, remaining: remaining)
             workSwitchStatus = !next.configured ? nil : next.state == "active" ? (next.catchUpPending == true ? "Switchr: Pending" : "Switchr: On") : next.state == "standby" ? "Switchr: Off" : "Switchr: Pending"
-            if automaticWorkAllowed && next.configured && next.catchUpPending == true { try await api.resumeWork() }
-            if automaticWorkAllowed && (previous == nil || previous?.state != "active" || previous?.revision != next.revision || (previous?.catchUpPending == true && next.catchUpPending == false)) {
+            if allowCatchUp && automaticWorkAllowed && next.configured && next.catchUpPending == true { try await api.resumeWork() }
+            if allowCatchUp && automaticWorkAllowed && (previous == nil || previous?.state != "active" || previous?.revision != next.revision || (previous?.catchUpPending == true && next.catchUpPending == false)) {
                 guard automaticWorkAllowed else { return }
                 unchangedTaskPolls = 0
                 await refresh(showLoading: false)
@@ -128,7 +133,12 @@ final class TaskStore: ObservableObject {
             workCheckTask = Task { [weak self] in
                 while !Task.isCancelled {
                     guard let self else { return }
-                    if isTaskSurfaceVisible { await checkWorkPermission() }
+                    let visible = isTaskSurfaceVisible
+                    if visible || backgroundAutomaticWorkDemand() {
+                        // A background integration-only lease read must not start hosted
+                        // catch-up, reconciliation or unrelated Task/Shortcut reads.
+                        await checkWorkPermission(allowCatchUp:visible)
+                    }
                     try? await Task.sleep(for: .seconds(30))
                 }
             }
@@ -170,7 +180,7 @@ final class TaskStore: ObservableObject {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
                 guard !Task.isCancelled, let self else { return }
-                guard installation.integrations.shortcut else { continue }
+                guard shortcutWorkEnabled else { continue }
                 await shortcutSync.syncIfDue(
                     isVisible: isTaskSurfaceVisible && automaticWorkAllowed, isSignedIn: isSignedIn
                 ) { [weak self] in
@@ -183,7 +193,7 @@ final class TaskStore: ObservableObject {
 
     func syncShortcutAndReload() async {
         await ConnectionContext.$trigger.withValue(.manual) {
-        guard isSignedIn, installation.integrations.shortcut else { return }
+        guard isSignedIn, shortcutWorkEnabled else { return }
         await shortcutSync.syncNow { [weak self] in
             guard let self else { return .ignored }
             return await fetchShortcutAndReload()
@@ -192,6 +202,7 @@ final class TaskStore: ObservableObject {
     }
 
     private func fetchShortcutAndReload() async -> ShortcutSyncSchedule.Outcome {
+        guard shortcutWorkEnabled else { return .ignored }
         do {
             let applied = try await api.syncShortcutNow()
             guard isSignedIn else { return .ignored }
@@ -381,7 +392,7 @@ final class TaskStore: ObservableObject {
     }
 
     func refreshShortcutBoard(showLoading: Bool = true) async {
-        guard installation.integrations.shortcut else { return }
+        guard shortcutWorkEnabled else { return }
         guard !isShortcutBoardRefreshing else { return }
         isShortcutBoardRefreshing = true
         if showLoading { isShortcutBoardLoading = true }
@@ -405,6 +416,7 @@ final class TaskStore: ObservableObject {
     }
 
     func refreshMiniDashboard(for mode: WorkspaceMode) async {
+        guard mode != .integration else { return }
         await ConnectionContext.$trigger.withValue(.manual) {
         await syncShortcutAndReload()
         switch mode {
@@ -412,6 +424,8 @@ final class TaskStore: ObservableObject {
             await refreshOpenTasks(showLoading: true)
         case .shortcut:
             await refreshShortcutBoard(showLoading: true)
+        case .integration:
+            return
         }
         guard case .signedIn = authenticationState else { return }
         await refreshReviewSummaryIfNeeded(force: true)

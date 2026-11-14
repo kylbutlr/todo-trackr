@@ -112,6 +112,33 @@ actor APIClient {
         try await send(path: "/api/work-state", method: "GET")
     }
 
+    /// Optional integration reads use the same server-scoped session and freshness checks.
+    func readIntegrationSettings<T: Decodable>(path: String) async throws -> T {
+        try await send(path: path)
+    }
+
+    func shortcutSettingsURL() -> URL {
+        baseURL.appending(queryItems: [URLQueryItem(name: "view", value: "connection:shortcut")])
+    }
+
+    func shortcutConnectionControl() async throws -> ShortcutConnectionControl {
+        struct Payload: Decodable { let connection: ShortcutConnectionControl }
+        let value: Payload = try await send(path: "/api/connections/shortcut")
+        guard ["off", "review", "automatic"].contains(value.connection.controlMode) else { throw APIError.invalidResponse }
+        return value.connection
+    }
+
+    /// Off changes the connection setting only. Never call sync/apply or retry a write.
+    func turnOffShortcutConnection() async throws -> ShortcutConnectionControl {
+        struct Body: Encodable { let mode = "off" }
+        struct Payload: Decodable { let connection: ShortcutConnectionControl }
+        let changed: Payload = try await send(path: "/api/connections/shortcut", method: "PATCH", body: Body())
+        guard changed.connection.isOff else { throw APIError.invalidResponse }
+        let confirmed = try await shortcutConnectionControl()
+        guard confirmed.isOff else { throw APIError.invalidResponse }
+        return confirmed
+    }
+
     func resumeWork() async throws {
         try await sendWithoutResponse(path: "/api/work-resume", method: "POST")
     }

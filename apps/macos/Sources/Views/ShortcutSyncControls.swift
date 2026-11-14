@@ -66,9 +66,11 @@ struct ShortcutSyncSettings: View {
     let isVisible: () -> Bool
     let isSignedIn: Bool
     let sync: () async -> Void
+    @State private var settingsURL: URL?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
+            WorkIntegrationFactory.settingsView()
             Text("Shortcut sync")
                 .font(DesignTokens.sans(17, weight: .semibold))
             Text("Fetch fresh Shortcut changes while Todo Trackr or Mini Trackr is visible.")
@@ -109,7 +111,7 @@ struct ShortcutSyncSettings: View {
                 .foregroundStyle(DesignTokens.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
             HStack {
-                Link("Connection settings", destination: URL(string: "https://todotrackr.netlify.app/?view=connection:shortcut")!)
+                if let settingsURL { Link("Connection settings", destination: settingsURL) }
                 Spacer()
                 Button("Sync now") { Task { await sync() } }
                     .disabled(!isSignedIn || schedule.isSyncing)
@@ -122,5 +124,8 @@ struct ShortcutSyncSettings: View {
         .frame(width: 350)
         .background(DesignTokens.surface)
         .preferredColorScheme(.dark)
+        .task {
+            settingsURL = await APIClient.shared.shortcutSettingsURL()
+        }
     }
 }

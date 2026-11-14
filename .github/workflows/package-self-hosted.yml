@@ -18,6 +18,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test -- --maxWorkers=2
+      - run: npm run test:profiles
       - run: npm run test:self-hosted
       - run: npm run check:migrations
       - run: npm run check:versions

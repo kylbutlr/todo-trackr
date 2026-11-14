@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { hasShortcutWorkflowDraft, refreshShortcutWorkflowDraft, subscribeToShortcutWorkflowReturn } from "./shortcutWorkflowDraft";
 import { api, APIError } from "./api";
 import type { ShortcutConnectionControlMode, ShortcutWorkflowSettings } from "./types";
+import { OptionalIntegrationSettings } from "./OptionalIntegrationSettings";
 
 export function ShortcutWorkflowSettingsView({ controlMode, disabled, onSaved }: {
   controlMode: ShortcutConnectionControlMode;
@@ -98,7 +99,7 @@ export function ShortcutWorkflowSettingsView({ controlMode, disabled, onSaved }:
     .map((id) => [id, knownNames.current.get(id) ?? `State ${id}`] as const) : [];
   const completionNames = settings ? Object.entries(settings.completionStates).filter(([id]) => !selected.includes(Number(id))).map(([, name]) => name) : [];
 
-  return <section className="shortcut-workflow-settings" aria-labelledby="shortcut-workflow-title" aria-busy={loading || saving}>
+  return <><OptionalIntegrationSettings /><section className="shortcut-workflow-settings" aria-labelledby="shortcut-workflow-title" aria-busy={loading || saving}>
     <div className="workflow-settings-heading">
       <div>
         <h2 id="shortcut-workflow-title">Workflow states to track</h2>
@@ -135,5 +136,5 @@ export function ShortcutWorkflowSettingsView({ controlMode, disabled, onSaved }:
       </div>
     </> : null}
     {error ? <div role="alert" className="workflow-settings-error"><p>{error}</p><button className="secondary-button" disabled={loading || saving} onClick={() => void reload(reloadRequired)} type="button">{reloadRequired ? "Reload saved settings" : "Retry refresh"}</button></div> : null}
-  </section>;
+  </section></>;
 }

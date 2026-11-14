@@ -9,6 +9,7 @@ final class MenuBarController: NSObject {
     private let quickCaptureController: GlobalQuickCaptureController
     private let checkForUpdates: () -> Void
     private let updatesEnabled: Bool
+    private let workIntegration: WorkIntegration?
     private var statusItem: NSStatusItem?
     private let menu = NSMenu()
     private var quickCaptureWindow: NSWindow?
@@ -19,7 +20,8 @@ final class MenuBarController: NSObject {
         miniDashboardWindowController: MiniDashboardWindowController,
         quickCaptureController: GlobalQuickCaptureController,
         checkForUpdates: @escaping () -> Void,
-        updatesEnabled: Bool
+        updatesEnabled: Bool,
+        workIntegration: WorkIntegration? = nil
     ) {
         self.store = store
         self.workspaceWindowController = workspaceWindowController
@@ -27,6 +29,7 @@ final class MenuBarController: NSObject {
         self.quickCaptureController = quickCaptureController
         self.checkForUpdates = checkForUpdates
         self.updatesEnabled = updatesEnabled
+        self.workIntegration = workIntegration
         super.init()
 
         quickCaptureController.onRequestPrepared = { [weak self] in
@@ -118,6 +121,7 @@ final class MenuBarController: NSObject {
 
         addItem(title: "Open Todo Trackr", action: #selector(openWorkspaceFromMenu))
         addItem(title: "Open Mini Trackr", action: #selector(openMiniDashboard))
+        if let workIntegration, workIntegration.isAvailable { addItem(title: "\(workIntegration.title)…", action: #selector(openWorkIntegration)) }
         menu.addItem(.separator())
 
         addInformationalItem(title: statusLabel)
@@ -167,6 +171,8 @@ final class MenuBarController: NSObject {
     @objc private func openQuickCapture() {
         quickCaptureController.prepareCapture()
     }
+
+    @objc private func openWorkIntegration() { workIntegration?.show() }
 
     @objc private func openWorkspaceFromMenu() {
         openWorkspace()

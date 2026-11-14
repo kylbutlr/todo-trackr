@@ -1,5 +1,28 @@
 import SwiftUI
 
+struct MiniWorkspacePicker: View {
+    @Binding var selectedMode: String
+    let shortcutAvailable: Bool
+    private var mode: WorkspaceMode { WorkProviderRouting.miniMode(selectedMode, shortcutAvailable: shortcutAvailable) }
+    var body: some View {
+        Menu {
+            Button("Tasks") { selectedMode = WorkspaceMode.tasks.rawValue }
+            if let providerID = WorkIntegrationFactory.providerID { Button(WorkIntegrationFactory.title) { selectedMode = providerID } }
+            if shortcutAvailable { Button("Shortcut (legacy)") { selectedMode = WorkspaceMode.shortcut.rawValue } }
+        } label: {
+            Image(systemName: mode.systemImage).font(.system(size: 13, weight: .bold))
+                .foregroundStyle(DesignTokens.action).frame(width: 30, height: 30)
+                .background(DesignTokens.selected, in: RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain).menuStyle(.borderlessButton).menuIndicator(.hidden)
+        .fixedSize().frame(width: 30, height: 30)
+        .background(DesignTokens.selected, in: RoundedRectangle(cornerRadius: 8))
+        .tint(DesignTokens.action)
+        .help("Showing \(mode.title). Choose a workspace")
+        .accessibilityLabel("Showing \(mode.title). Choose a workspace")
+    }
+}
+
 struct MiniDashboardSyncStatusView: View {
     @EnvironmentObject private var store: TaskStore
 

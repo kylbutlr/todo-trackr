@@ -25,6 +25,7 @@ import {
 } from "./lib/push-notifications.js";
 import { createListSchema, createTaskList, listTaskLists } from "./lib/lists.js";
 import { loadShortcutWorkflowSettings, updateShortcutWorkflowSettings, shortcutSettingsSchema } from "./lib/automation/shortcut-settings.js";
+import { optionalIntegrationRoute } from "./lib/optional-integration.js";
 import { buildShortcutPreview } from "./lib/automation/shortcut-preview.js";
 import {
   loadShortcutBoard,
@@ -231,6 +232,9 @@ async function route(request: Request): Promise<Response> {
   }
 
   await requireSession(request);
+
+  const integrationResponse = await optionalIntegrationRoute(request, pathname);
+  if (integrationResponse) return integrationResponse;
 
   if (pathname === "/api/work-state" && request.method === "GET") {
     return json(await clientWorkPermission());

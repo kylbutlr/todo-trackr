@@ -27,3 +27,5 @@ Run `npm run test:macos-install` to exercise downgrade prevention and failure re
 ## Existing legacy installations
 
 Existing 0.2.x installations continue to use the hosted legacy Sparkle feed. The web build preserves the previously published signed 0.2.90 release through the [verified compatibility overlay](../legacy/macos/README.md). This does not turn the current source-only release into a new Mac binary distribution.
+
+[Public and personal build profiles](build-profiles.md) describe the optional local integration boundary.

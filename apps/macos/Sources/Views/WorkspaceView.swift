@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WorkspaceView: View {
     @EnvironmentObject private var store: TaskStore
+    @EnvironmentObject private var integration: WorkIntegration
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("todo-trackr.workspace-layout") private var workspaceLayoutRaw = WorkspaceLayoutMode.standard.rawValue
     @AppStorage("todo-trackr.workspace-mode") private var workspaceModeRaw = WorkspaceMode.tasks.rawValue
@@ -24,7 +25,7 @@ struct WorkspaceView: View {
         .tint(DesignTokens.action)
         .toolbar {
             ToolbarItem(placement: .status) {
-                if store.installation.integrations.shortcut { ShortcutSyncControls(schedule: store.shortcutSync,
+                if store.shortcutWorkEnabled { ShortcutSyncControls(schedule: store.shortcutSync,
                                      isVisible: { store.isTaskSurfaceVisible },
                                      isSignedIn: store.isSignedIn,
                                      sync: { await store.syncShortcutAndReload() }) }
@@ -41,13 +42,17 @@ struct WorkspaceView: View {
                 }
             }
             ToolbarItem(placement: .primaryAction) {
-                if store.installation.integrations.shortcut { Button(action: toggleWorkspaceMode) {
-                    Label(
-                        workspaceMode == .tasks ? "Shortcut" : "Tasks",
-                        systemImage: workspaceMode == .tasks ? "link" : "checkmark"
-                    )
-                }
-                .help(workspaceMode == .tasks ? "Show live Shortcut Stories" : "Show Todo Trackr Tasks") }
+                Menu {
+                    Button("Tasks") { workspaceModeRaw = WorkspaceMode.tasks.rawValue }
+                    if integration.isAvailable { Button(integration.title) { workspaceModeRaw = integration.providerID ?? WorkspaceMode.tasks.rawValue } }
+                    if store.installation.integrations.shortcut {
+                        Button("Shortcut") {
+                            workspaceModeRaw = WorkspaceMode.shortcut.rawValue
+                            Task { await store.refreshShortcutBoard() }
+                        }
+                    }
+                } label: { Label(workspaceMode.title, systemImage: workspaceMode.systemImage) }
+                .help("Choose Tasks or an optional work provider")
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(action: toggleWorkspaceLayout) {
@@ -99,6 +104,21 @@ struct WorkspaceView: View {
                         .buttonStyle(.plain)
                         .foregroundStyle(workspaceMode == .tasks && view == .smart(item) ? DesignTokens.text : DesignTokens.textMuted)
                         .listRowBackground(workspaceMode == .tasks && view == .smart(item) ? DesignTokens.selected : Color.clear)
+                    }
+                }
+                Section("Workspaces") {
+                    if integration.isAvailable { Button {
+                        workspaceModeRaw = integration.providerID ?? WorkspaceMode.tasks.rawValue
+                    } label: { Label(integration.title, systemImage: "link") }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(workspaceMode == .integration ? DesignTokens.text : DesignTokens.textMuted)
+                    .listRowBackground(workspaceMode == .integration ? DesignTokens.selected : Color.clear) }
+                    if store.installation.integrations.shortcut {
+                        Button {
+                            workspaceModeRaw = WorkspaceMode.shortcut.rawValue
+                            Task { await store.refreshShortcutBoard() }
+                        } label: { Label("Shortcut", systemImage: "link") }
+                        .buttonStyle(.plain)
                     }
                 }
                 Section("My Lists") {
@@ -159,6 +179,8 @@ struct WorkspaceView: View {
             .appSurfaceBackground(.sidebar)
             .navigationTitle("Todo Trackr")
             .safeAreaInset(edge: .bottom) {
+                VStack(alignment: .leading, spacing: 8) {
+                    connectionButton
                 HStack(spacing: 10) {
                     if let status = store.workSwitchStatus {
                         Text(status).font(.caption).foregroundStyle(DesignTokens.textMuted)
@@ -180,37 +202,34 @@ struct WorkspaceView: View {
                 .padding(.top, AppStylrTokens.Spacing.space8)
                 .padding(.bottom, AppStylrTokens.Spacing.space16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        } content: {
-            Group {
-                if workspaceMode == .shortcut {
-                    ShortcutBoardListView()
-                } else {
-                    TaskListView(
-                        view: view ?? .smart(.inbox),
-                        search: $search,
-                        priority: $priority,
-                        due: $due,
-                        sort: $sort
-                    )
                 }
             }
-                .navigationSplitViewColumnWidth(min: 360, ideal: 470)
+        } content: {
+            WorkIntegrationLayer(showingIntegration: workspaceMode == .integration) {
+                if contentMode == .shortcut {
+                    ShortcutBoardListView()
+                } else {
+                    TaskListView(view: view ?? .smart(.inbox), search: $search, priority: $priority, due: $due, sort: $sort)
+                }
+            } integration: { integration.listView() }
+            .navigationSplitViewColumnWidth(min: 360, ideal: 470)
         } detail: {
-            if workspaceMode == .shortcut, let story = store.selectedShortcutStory {
-                ShortcutBoardDetailView(story: story)
-                    .id(story.externalReference)
-            } else if workspaceMode == .tasks, let task = store.selectedTask {
-                TaskDetailView(task: task)
-                    .id(task.id)
-            } else {
-                ContentUnavailableView(
-                    workspaceMode == .tasks ? "Select a task" : "Select a Shortcut Story",
-                    systemImage: workspaceMode == .tasks ? "checkmark.circle" : "link",
-                    description: Text(workspaceMode == .tasks ? "Choose a task to view and edit its details." : "Choose a Story to view its live Shortcut details.")
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .appSurfaceBackground(.sidebar)
+            WorkIntegrationLayer(showingIntegration: workspaceMode == .integration) {
+                if contentMode == .shortcut, let story = store.selectedShortcutStory {
+                    ShortcutBoardDetailView(story: story).id(story.externalReference)
+                } else if contentMode == .tasks, let task = store.selectedTask {
+                    TaskDetailView(task: task).id(task.id)
+                } else {
+                    ContentUnavailableView(
+                        contentMode == .tasks ? "Select a task" : "Select a Shortcut Story",
+                        systemImage: contentMode == .tasks ? "checkmark.circle" : "link",
+                        description: Text(contentMode == .tasks ? "Choose a task to view and edit its details." : "Choose a Story to view its live Shortcut details.")
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .appSurfaceBackground(.sidebar)
+                }
+            } integration: {
+                integration.detailView()
             }
         }
     }
@@ -226,46 +245,34 @@ struct WorkspaceView: View {
 
     private var compactContent: some View {
         NavigationStack {
-            if workspaceMode == .shortcut, let story = store.selectedShortcutStory {
-                ShortcutBoardDetailView(story: story)
-                    .id(story.externalReference)
-                    .toolbar {
-                        ToolbarItem(placement: .navigation) {
-                            Button {
-                                store.selectedShortcutStoryReference = nil
-                            } label: {
-                                Label("Shortcut", systemImage: "chevron.left")
+            WorkIntegrationLayer(showingIntegration: workspaceMode == .integration) {
+                if contentMode == .shortcut, let story = store.selectedShortcutStory {
+                    ShortcutBoardDetailView(story: story)
+                        .id(story.externalReference)
+                        .toolbar {
+                            if workspaceMode != .integration {
+                                ToolbarItem(placement: .navigation) {
+                                    Button { store.selectedShortcutStoryReference = nil } label: { Label("Shortcut", systemImage: "chevron.left") }
+                                }
                             }
                         }
-                    }
-            } else if workspaceMode == .tasks, let task = store.selectedTask {
-                TaskDetailView(task: task)
-                    .id(task.id)
-                    .toolbar {
-                        ToolbarItem(placement: .navigation) {
-                            Button {
-                                store.selectedTaskID = nil
-                            } label: {
-                                Label("Tasks", systemImage: "chevron.left")
+                } else if contentMode == .tasks, let task = store.selectedTask {
+                    TaskDetailView(task: task)
+                        .id(task.id)
+                        .toolbar {
+                            if workspaceMode != .integration {
+                                ToolbarItem(placement: .navigation) {
+                                    Button { store.selectedTaskID = nil } label: { Label("Tasks", systemImage: "chevron.left") }
+                                }
                             }
                         }
-                    }
-            } else if workspaceMode == .shortcut {
-                ShortcutBoardListView(
-                    automaticallySelectFirstStory: false,
-                    isCompact: true
-                )
-            } else {
-                TaskListView(
-                    view: view ?? .smart(.inbox),
-                    search: $search,
-                    priority: $priority,
-                    due: $due,
-                    sort: $sort,
-                    automaticallySelectFirstTask: false,
-                    isCompact: true
-                )
-            }
+                } else if contentMode == .shortcut {
+                    ShortcutBoardListView(automaticallySelectFirstStory: false, isCompact: true)
+                } else {
+                    TaskListView(view: view ?? .smart(.inbox), search: $search, priority: $priority, due: $due,
+                                 sort: $sort, automaticallySelectFirstTask: false, isCompact: true)
+                }
+            } integration: { integration.compactView() }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -311,6 +318,9 @@ struct WorkspaceView: View {
                     }
 
                     compactRailDivider
+                    if integration.isAvailable { compactRailButton(title: integration.title, systemImage: "link", isActive: workspaceMode == .integration, count: integration.itemCount) {
+                        workspaceModeRaw = integration.providerID ?? WorkspaceMode.tasks.rawValue
+                    } }
                     ForEach([TaskSource.shortcut, TaskSource.granola].filter { $0 == .shortcut ? store.installation.integrations.shortcut : store.installation.integrations.granola }, id: \.self) { source in
                         compactRailButton(
                             title: source.label,
@@ -327,6 +337,7 @@ struct WorkspaceView: View {
             .scrollIndicators(.hidden)
 
             VStack(spacing: 4) {
+                connectionButton.labelStyle(.iconOnly)
                 SyncStatusView(state: store.syncState, showsLabel: false)
                     .frame(width: 40, height: 34)
                 Button {
@@ -344,6 +355,18 @@ struct WorkspaceView: View {
         .padding(.vertical, 12)
         .frame(width: 56)
         .appSurfaceBackground(.sidebar)
+    }
+
+    @ViewBuilder private var connectionButton: some View {
+        if store.installation.integrations.shortcut {
+            Button { ShortcutConnectionWindow.show() } label: {
+                Label("Connections", systemImage: "point.3.connected.trianglepath.dotted")
+                    .font(DesignTokens.sans(11)).padding(8)
+            }
+            .buttonStyle(.plain).foregroundStyle(DesignTokens.textMuted)
+            .help("Manage the optional hosted Shortcut connection")
+            .accessibilityLabel("Connections")
+        }
     }
 
     private var compactRailDivider: some View {
@@ -393,11 +416,19 @@ struct WorkspaceView: View {
         WorkspaceLayoutMode(rawValue: workspaceLayoutRaw) ?? .standard
     }
 
+    // Keep the Task subtree mounted under integrations so unsaved editor and Quick Capture
+    // drafts survive a provider visit. Shortcut retains its existing separate view.
+    private var contentMode: WorkspaceMode { workspaceMode == .integration ? .tasks : workspaceMode }
+
     private var workspaceMode: WorkspaceMode {
-        store.installation.integrations.shortcut ? (WorkspaceMode(rawValue: workspaceModeRaw) ?? .tasks) : .tasks
+        WorkProviderRouting.miniMode(workspaceModeRaw, shortcutAvailable: store.installation.integrations.shortcut)
     }
 
     private func selectView(_ nextView: TaskView) {
+        if workspaceMode == .integration, view == nextView {
+            workspaceModeRaw = WorkspaceMode.tasks.rawValue
+            return
+        }
         workspaceModeRaw = WorkspaceMode.tasks.rawValue
         view = nextView
         store.selectedTaskID = nil
@@ -405,16 +436,6 @@ struct WorkspaceView: View {
         if case let .smart(smartView) = nextView,
            smartView == .recent || smartView == .completed || smartView == .archived {
             Task { await store.refresh(showLoading: false) }
-        }
-    }
-
-    private func toggleWorkspaceMode() {
-        let nextMode: WorkspaceMode = workspaceMode == .tasks ? .shortcut : .tasks
-        workspaceModeRaw = nextMode.rawValue
-        store.selectedTaskID = nil
-        store.selectedShortcutStoryReference = nil
-        if nextMode == .shortcut {
-            Task { await store.refreshShortcutBoard() }
         }
     }
 

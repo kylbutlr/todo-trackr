@@ -7,6 +7,12 @@ import { DIRECT_SHORTCUT_RULE_ID, type ShortcutRuleSettings } from "./shortcut-r
 const stateMapSchema = z.record(z.string().regex(/^[1-9]\d*$/u), z.string().trim().min(1));
 const storedConfigSchema = z.object({ active_states: stateMapSchema, completion_states: stateMapSchema });
 
+export function assertShortcutCatalog(availableStates: ShortcutWorkflowState[]): void {
+  if (!availableStates.length || new Set(availableStates.map(({ id }) => id)).size !== availableStates.length) {
+    throw new HttpError(503, "Shortcut returned an empty or conflicting workflow catalog. No Tasks were changed.");
+  }
+}
+
 export const shortcutSettingsSchema = z.object({
   expectedVersion: z.number().int().positive(),
   activeStateIds: z.array(z.number().int().positive()).max(200),
@@ -37,6 +43,7 @@ export async function loadShortcutWorkflowSettings(): Promise<ShortcutWorkflowSe
 }
 
 function settingsWithCurrentNames(rule: ShortcutRuleSettings, availableStates: ShortcutWorkflowState[]): ShortcutWorkflowSettings {
+  assertShortcutCatalog(availableStates);
   const names = new Map(availableStates.map((state) => [String(state.id), state.name]));
   const currentNames = (states: Record<string, string>) => Object.fromEntries(
     Object.entries(states).map(([id, name]) => [id, names.get(id) ?? name]),
@@ -45,6 +52,7 @@ function settingsWithCurrentNames(rule: ShortcutRuleSettings, availableStates: S
 }
 
 export function resolveShortcutRuleSettings(rule: ShortcutRuleSettings, availableStates: ShortcutWorkflowState[]): ShortcutRuleSettings {
+  assertShortcutCatalog(availableStates);
   const byId = new Map(availableStates.map((state) => [String(state.id), state]));
   const activeStates = Object.fromEntries(Object.keys(rule.activeStates).flatMap((id) => {
     const state = byId.get(id);
@@ -71,6 +79,7 @@ export async function loadCurrentShortcutRuleSettings(): Promise<ShortcutRuleSet
 }
 
 export function selectedShortcutStates(ids: number[], availableStates: ShortcutWorkflowState[]): Record<string, string> {
+  assertShortcutCatalog(availableStates);
   const selected: Record<string, string> = {};
   for (const id of new Set(ids)) {
     const state = availableStates.find((candidate) => candidate.id === id);

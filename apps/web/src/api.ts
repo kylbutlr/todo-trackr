@@ -28,7 +28,7 @@ export function onSessionExpired(handler: () => void) {
   };
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+export async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
     cache: init?.cache ?? "no-store",

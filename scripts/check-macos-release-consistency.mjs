@@ -71,7 +71,7 @@ const requiredChangedFiles = [
   "package.json",
   "package-lock.json",
   "apps/web/package.json",
-  "apps/browser-extension/manifest.json",
+  "apps/browser-extension-public/manifest.json",
   "apps/macos/Resources/Info.plist",
   "apps/web/public/updates/appcast.xml",
 ];
@@ -82,7 +82,7 @@ if (missingChanges.length > 0) {
 
 const rootPackage = JSON.parse(file("package.json"));
 const webPackage = JSON.parse(file("apps/web/package.json"));
-const browserExtensionManifest = JSON.parse(file("apps/browser-extension/manifest.json"));
+const browserExtensionManifest = JSON.parse(file("apps/browser-extension-public/manifest.json"));
 const packageLock = JSON.parse(file("package-lock.json"));
 const infoPlist = file("apps/macos/Resources/Info.plist");
 const appcast = file("apps/web/public/updates/appcast.xml");
@@ -93,7 +93,7 @@ const expectedBuild = buildNumber(version);
 const versions = new Map([
   ["package.json", rootPackage.version],
   ["apps/web/package.json", webPackage.version],
-  ["apps/browser-extension/manifest.json", browserExtensionManifest.version],
+  ["apps/browser-extension-public/manifest.json", browserExtensionManifest.version],
   ["package-lock.json", packageLock.version],
   ["package-lock.json root package", packageLock.packages?.[""]?.version],
   ["package-lock.json web workspace", packageLock.packages?.["apps/web"]?.version],

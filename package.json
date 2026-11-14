@@ -1,6 +1,6 @@
 {
   "name": "todo-tracker",
-  "version": "1.1.1",
+  "version": "1.1.15",
   "private": true,
   "type": "module",
   "engines": {
@@ -33,7 +33,12 @@
     "package:source": "node scripts/package-source.mjs",
     "styles": "node scripts/sync-app-stylr.mjs",
     "styles:check": "node scripts/sync-app-stylr.mjs --check",
-    "pretest": "npm run styles:check"
+    "pretest": "npm run styles:check",
+    "package:extension:personal": "TODO_TRACKR_BUILD_PROFILE=personal node scripts/package-extension.mjs",
+    "build:web:personal": "TODO_TRACKR_BUILD_PROFILE=personal npm --workspace @todo-tracker/web run build",
+    "build:server:personal": "TODO_TRACKR_BUILD_PROFILE=personal node scripts/build-server.mjs",
+    "test:profiles": "node --test tests/build-profiles.node.mjs",
+    "test:profiles:personal": "TODO_TRACKR_BUILD_PROFILE=personal node --test tests/build-profiles.node.mjs"
   },
   "workspaces": [
     "apps/web"

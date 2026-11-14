@@ -7,7 +7,7 @@ import { captureTitle } from "../apps/browser-extension/capture.js";
 describe("browser Quick Capture", () => {
   it("uses the product name for the installed extension", () => {
     const manifest = JSON.parse(readFileSync(
-      new URL("../apps/browser-extension/manifest.json", import.meta.url),
+      new URL("../apps/browser-extension-public/manifest.json", import.meta.url),
       "utf8",
     )) as { name: string; action: { default_title: string } };
 
@@ -29,7 +29,7 @@ describe("browser Quick Capture", () => {
 
   it("suggests Command-Shift-E for Quick Capture", () => {
     const manifest = JSON.parse(readFileSync(
-      new URL("../apps/browser-extension/manifest.json", import.meta.url),
+      new URL("../apps/browser-extension-public/manifest.json", import.meta.url),
       "utf8",
     )) as { commands: { "quick-capture": { suggested_key: Record<string, string> } } };
 
@@ -41,7 +41,7 @@ describe("browser Quick Capture", () => {
 
   it("shows Command-Shift-E in the extension popup", () => {
     const popup = readFileSync(
-      new URL("../apps/browser-extension/popup.html", import.meta.url),
+      new URL("../apps/browser-extension-public/popup.html", import.meta.url),
       "utf8",
     );
 
@@ -58,7 +58,7 @@ describe("browser Quick Capture", () => {
 
   it("attributes captures from Slack web and looks for a message permalink", () => {
     const background = readFileSync(
-      new URL("../apps/browser-extension/background.js", import.meta.url),
+      new URL("../apps/browser-extension-public/background.js", import.meta.url),
       "utf8",
     );
 

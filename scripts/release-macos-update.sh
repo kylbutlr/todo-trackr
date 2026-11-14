@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+if [[ "${TODO_TRACKR_BUILD_PROFILE:-public}" != "public" ]]; then
+    echo "Only the public profile may use the public release/update channel." >&2
+    exit 64
+fi
+
 if [[ $# -ne 1 ]]; then
     echo "Usage: $0 VERSION" >&2
     echo "Example: $0 1.0.0" >&2

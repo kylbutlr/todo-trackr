@@ -4,14 +4,20 @@ import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+import { isPublicSource } from "./public-files.mjs";
+import { buildProfile } from "./build-profile.mjs";
+import { verifyBuildReceipt } from "./build-receipt.mjs";
+if (buildProfile() !== "public") throw new Error("Personal server artifacts cannot use public release packaging");
+await verifyBuildReceipt("dist/server.mjs.profile.json", "dist", "server.mjs");
+await verifyBuildReceipt("apps/web/dist/build-profile.json", "apps/web/dist", "index.html");
 const { version } = JSON.parse(await readFile("package.json", "utf8"));
-const output = resolve("dist/releases");
+const output = resolve(process.env.TODO_TRACKR_PACKAGE_OUTPUT ?? "dist/releases");
 await mkdir(output, { recursive: true });
 const staging = await mkdtemp(join(tmpdir(), "todo-trackr-server-"));
 try {
   for (const file of ["package.json", "package-lock.json", "vendor/packages", "release.json", "LICENSE", "SECURITY.md", "CONTRIBUTING.md", "CONTEXT.md", "CHANGELOG.md", ".env.self-hosted.example", "database", "docs", "design/GEIST-LICENSE.txt", "scripts/migrate-database.mjs", "scripts/hash-password.mjs", "dist/server.mjs", "apps/web/package.json"]) {
     await mkdir(resolve(staging, file, ".."), { recursive: true });
-    await cp(file, join(staging, file), { recursive: true });
+    await cp(file, join(staging, file), { recursive: true, filter: (source) => isPublicSource(source.replaceAll("\\", "/")) });
   }
   await cp("apps/web/dist", join(staging, "apps/web/dist"), { recursive: true, filter: (file) => !file.split(/[\\/]/u).includes("updates") });
   const runtime = JSON.parse(await readFile(join(staging, "package.json"), "utf8"));

@@ -46,7 +46,7 @@ named lists, and System health. Task details keep **Save changes** at the top as
 you scroll, with a shorter notes field. Desktop navigation and editing retain
 their existing layout.
 
-In the Mac app or extension, enter your server origin and connect. See the [extension instructions](apps/browser-extension/README.md) for browser permissions, capture shortcuts, and manual updates. Native source-build and guarded local installation instructions are in [macOS installation](docs/macos-installation.md). The public release does not distribute a prebuilt Mac app or signed update feed. Source-built apps use manual updates.
+In the Mac app or extension, enter your server origin and connect. See the [extension instructions](apps/browser-extension-public/README.md) for browser permissions, capture shortcuts, and manual updates. Native source-build and guarded local installation instructions are in [macOS installation](docs/macos-installation.md). The public release does not distribute a prebuilt Mac app or signed update feed. Source-built apps use manual updates.
 
 The original hosted adapter remains available for the existing deployment. Its Shortcut, Granola, and Codex integrations retain personal mappings and are disabled in standalone installations. They are not advertised as general-purpose v1 features. [App Switchr](docs/app-switchr.md) is an optional hosted adapter; standalone clients do not poll it or wait for its permission.
 
@@ -55,7 +55,8 @@ The original hosted adapter remains available for the existing deployment. Its S
 Use Node.js 24. Install dependencies with `npm ci`, then follow the [contribution guide](CONTRIBUTING.md) for validation and the [self-hosting guide](docs/self-hosting.md) for a disposable development installation. Never use personal or production task data for tests.
 
 ```text
-apps/browser-extension/  Chromium Quick Capture client
+apps/browser-extension-public/  Public Quick Capture entrypoints
+apps/browser-extension/         Shared capture assets
 apps/macos/              SwiftUI companion
 apps/web/                React workspace
 server/                  Standalone HTTP server and alarm worker
@@ -72,3 +73,5 @@ See [architecture](docs/architecture.md) for application boundaries and [product
 The [privacy guide](docs/privacy.md) explains stored data, network access, optional services, and capture permissions. See [security](SECURITY.md) to report a vulnerability and [contributing](CONTRIBUTING.md) to propose a change. Release changes are tracked in the [changelog](CHANGELOG.md).
 
 Keep database credentials, password verifiers, session secrets, signing keys, and task backups private. Preserve the [Geist font notice](design/GEIST-LICENSE.txt) when redistributing the application.
+
+[Build profiles](docs/build-profiles.md) describe the optional local integration boundary.

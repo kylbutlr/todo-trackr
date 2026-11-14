@@ -7,17 +7,20 @@ final class WorkspaceWindowController {
 
     private var window: NSWindow?
     private weak var store: TaskStore?
+    private let workIntegration: WorkIntegration
     private let activateApplication: () -> Void
     private let makeWindow: (() -> NSWindow?)?
 
     init(
         store: TaskStore? = nil,
+        workIntegration: WorkIntegration? = nil,
         activateApplication: @escaping () -> Void = {
             NSApp.activate(ignoringOtherApps: true)
         },
         makeWindow: (() -> NSWindow?)? = nil
     ) {
         self.store = store
+        self.workIntegration = workIntegration ?? WorkIntegration()
         self.activateApplication = activateApplication
         self.makeWindow = makeWindow
     }
@@ -58,6 +61,7 @@ final class WorkspaceWindowController {
 
         let rootView = ContentView()
             .environmentObject(store)
+            .environmentObject(workIntegration)
             .font(DesignTokens.sans(14))
             .preferredColorScheme(.dark)
             .frame(minWidth: 380, minHeight: 620)

@@ -29,6 +29,7 @@ jobs:
       - run: bash -n scripts/build-macos-app.sh scripts/release-macos-update.sh scripts/install-macos.sh
       - run: npm run test:macos-install
       - run: npm test
+      - run: npm run test:profiles
       - run: npm run test:self-hosted
       - run: npm run typecheck
       - run: npm run build:web

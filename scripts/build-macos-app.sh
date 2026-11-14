@@ -13,6 +13,14 @@ package_directory="$repository_root/apps/macos"
 output_directory="$1"
 application_name="Todo Trackr"
 executable_name="TodoTracker"
+profile="${TODO_TRACKR_BUILD_PROFILE:-public}"
+case "$profile" in public|personal) ;; *) echo "Unknown Todo Trackr build profile: $profile" >&2; exit 64 ;; esac
+export TODO_TRACKR_BUILD_PROFILE="$profile"
+if [[ "$profile" == "personal" && "${TODO_TRACKR_DISTRIBUTION:-source}" != "source" ]]; then
+    echo "Personal builds cannot use the public release/update channel." >&2
+    exit 64
+fi
+scratch_directory="$package_directory/.build-$profile"
 signing_identity="${TODO_TRACKR_CODESIGN_IDENTITY:-Todo Trackr Local Code Signing}"
 
 if [[ "$signing_identity" == "-" ]]; then
@@ -38,8 +46,8 @@ source_info_plist="$package_directory/Resources/Info.plist"
 application_version="${TODO_TRACKR_VERSION:-$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$source_info_plist")}"
 application_build="${TODO_TRACKR_BUILD:-$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$source_info_plist")}"
 
-swift build --configuration release --package-path "$package_directory" >&2
-product_directory="$(swift build --configuration release --package-path "$package_directory" --show-bin-path 2>/dev/null)"
+swift build --configuration release --jobs "${TODO_TRACKR_SWIFT_JOBS:-1}" --package-path "$package_directory" --scratch-path "$scratch_directory" >&2
+product_directory="$(swift build --configuration release --package-path "$package_directory" --scratch-path "$scratch_directory" --show-bin-path 2>/dev/null)"
 sparkle_framework="$product_directory/Sparkle.framework"
 
 if [[ ! -d "$sparkle_framework" ]]; then
@@ -51,7 +59,16 @@ contents_directory="$application_bundle/Contents"
 mkdir -p "$contents_directory/MacOS" "$contents_directory/Frameworks" "$contents_directory/Resources"
 
 cp "$product_directory/$executable_name" "$contents_directory/MacOS/$executable_name"
+if [[ "$profile" == "personal" ]]; then
+    # Helpers belong to the optional package, not the public target graph.
+    personal_helpers="$(python3 -c 'import json,sys; print("\n".join(json.load(open(sys.argv[1]))["bundledExecutables"]))' "$package_directory/Personal/build.json")"
+    while IFS= read -r helper; do
+        [[ -n "$helper" && "$helper" != */* ]] || { echo "Invalid personal helper name" >&2; exit 64; }
+        cp "$product_directory/$helper" "$contents_directory/MacOS/$helper"
+    done <<< "$personal_helpers"
+fi
 cp "$source_info_plist" "$contents_directory/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :TodoTrackrBuildProfile string $profile" "$contents_directory/Info.plist"
 cp -R "$package_directory/Sources/Resources/Fonts" "$contents_directory/Resources/Fonts"
 ditto "$sparkle_framework" "$contents_directory/Frameworks/Sparkle.framework"
 
@@ -87,6 +104,11 @@ SIZES
 
 iconutil --convert icns "$iconset_directory" --output "$contents_directory/Resources/TodoTracker.icns"
 
+if [[ "$profile" == "personal" ]]; then
+    while IFS= read -r helper; do
+        codesign --force --timestamp=none --sign "$signing_identity" "$contents_directory/MacOS/$helper"
+    done <<< "$personal_helpers"
+fi
 codesign --force --timestamp=none --sign "$signing_identity" \
     "$contents_directory/MacOS/$executable_name"
 codesign --force --timestamp=none --sign "$signing_identity" \
