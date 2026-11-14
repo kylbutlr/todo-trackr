@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildProfile } from "../scripts/build-profile.mjs";
 import { isPublicSource } from "../scripts/public-files.mjs";
 import { contentHash, verifyBuildReceipt } from "../scripts/build-receipt.mjs";
+import { preparePublicSource } from "../scripts/prepare-public-source.mjs";
 
 test("profile selection defaults to public and rejects unknown variants", () => {
   assert.equal(buildProfile("public"), "public");
@@ -65,4 +66,21 @@ test("personal receipts cannot label an artifact as public", async () => {
     await writeFile(receipt, JSON.stringify({ profile: "personal", files: { "index.html": contentHash(await readFile(bundle)) } }));
     await assert.rejects(verifyBuildReceipt(receipt, output, "index.html"), /missing public content receipt/u);
   } finally { await rm(output, { recursive: true, force: true }); }
+});
+
+test("public source export preserves repository export-ignore attributes", async () => {
+  const root = await mkdtemp(join(tmpdir(), "todo-export-attributes-"));
+  try {
+    execFileSync("git", ["init", "--quiet", root]);
+    await mkdir(join(root, "historical binaries"));
+    await writeFile(join(root, ".gitattributes"), '"/historical binaries" export-ignore\n');
+    await writeFile(join(root, "historical binaries", "old-client.zip"), "synthetic historical binary");
+    await writeFile(join(root, "README.md"), "synthetic public source");
+    execFileSync("git", ["add", ".gitattributes", "README.md", "historical binaries"], { cwd: root });
+    const output = join(root, "export");
+    await preparePublicSource(root, output);
+    assert.equal(await readFile(join(output, "README.md"), "utf8"), "synthetic public source");
+    await assert.rejects(readFile(join(output, "historical binaries", "old-client.zip")), { code: "ENOENT" });
+    assert.equal(JSON.parse(await readFile(join(output, "build-profile.json"), "utf8")).profile, "public");
+  } finally { await rm(root, { recursive: true, force: true }); }
 });
