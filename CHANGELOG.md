@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.16
+
+- Keep the last working Mac server address after an unsuccessful connection attempt, and remember a changed server only after authentication succeeds.
+- Support a build-owned default server without changing public self-hosting defaults or server-scoped credentials.
+
 ## 1.1.1
 
 - Resume Quick Capture server setup after Chrome closes the popup for its native site-access prompt, without repeating the server URL or Connect action.
