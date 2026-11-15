@@ -331,6 +331,7 @@ final class TaskStore: ObservableObject {
             installation = try await api.installation()
             if installation.authenticationMode == "password" { try await api.login(password: password) }
             else { try await api.validateSession() }
+            await api.rememberAuthenticatedServer()
             authenticationState = .signedIn
             await refresh()
         } catch {

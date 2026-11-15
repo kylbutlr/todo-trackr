@@ -9,6 +9,7 @@ actor APIClient {
     private var capabilities = InstallationCapabilities.legacy
     private nonisolated let connectionGeneration = ConnectionGeneration()
     private let session: URLSession
+    private let connectionDefaults: UserDefaults
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
     private var taskSnapshots: [String: TaskSnapshot] = [:]
@@ -22,12 +23,14 @@ actor APIClient {
         baseURL: URL = APIClient.configuredBaseURL(),
         session: URLSession = .shared,
         activity: ConnectionRecorder? = nil,
-        credential: (@Sendable () throws -> String?)? = nil
+        credential: (@Sendable () throws -> String?)? = nil,
+        connectionDefaults: UserDefaults = .standard
     ) {
         self.credential = credential
         self.activity = activity
         self.baseURL = baseURL
         self.session = session
+        self.connectionDefaults = connectionDefaults
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .custom { decoder in
@@ -66,7 +69,11 @@ actor APIClient {
         baseURL = server
         capabilities = .legacy
         taskSnapshots = [:]
-        UserDefaults.standard.set(server.absoluteString, forKey: ServerConnection.preferenceKey)
+    }
+
+    /// Commit only after login or passwordless session validation succeeds.
+    func rememberAuthenticatedServer() {
+        connectionDefaults.set(baseURL.absoluteString, forKey: ServerConnection.preferenceKey)
     }
 
     func installation() async throws -> InstallationCapabilities {

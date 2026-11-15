@@ -36,6 +36,8 @@ npm run build:server:personal
 
 Personal packaging has distinct artifact names and build output paths. Personal native builds cannot use the public Sparkle release channel. Both native variants preserve the established app identity; the installer refuses cross-profile replacement, including legacy private bundles identified by their receiver. Coexistence under separate bundle identities would require a separately reviewed data and Keychain migration. This preparation does not attempt that migration.
 
+The personal Mac build defaults to the existing hosted Todo Trackr server even when no session is available or Keychain is locked. A remembered valid origin and an explicit development environment override still take precedence. The public build retains its standalone default and legacy-session compatibility. A changed server is remembered only after login or passwordless session validation succeeds; a failed connection does not replace the last working origin. Signing out removes the session, not the remembered server. Credentials remain scoped to each server, and this policy does not migrate installed settings or history.
+
 ## Installed integration and history
 
 No installed app, defaults, Keychain items, native-host registration, extension permissions or metadata ledgers are migrated by build selection. The currently loaded unpacked extension tree is intentionally frozen during this preparation. Its owner entrypoints are excluded from public source and extension artifacts. Do not reload or replace it as part of public packaging.

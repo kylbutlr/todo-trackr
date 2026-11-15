@@ -20,10 +20,17 @@ enum ServerConnection {
         return result
     }
 
-    static func configuredURL() -> URL {
-        if let value = ProcessInfo.processInfo.environment["TODO_TRACKER_API_BASE_URL"], let url = try? normalize(value) { return url }
-        if let value = UserDefaults.standard.string(forKey: preferenceKey), let url = try? normalize(value) { return url }
-        if (try? KeychainStore.token()) != nil { return URL(string: legacyOrigin)! }
+    static func configuredURL(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        defaults: UserDefaults = .standard,
+        defaultOrigin: String? = WorkIntegrationFactory.defaultServerOrigin,
+        hasLegacySession: () throws -> Bool = { try KeychainStore.token() != nil }
+    ) -> URL {
+        if let value = environment["TODO_TRACKER_API_BASE_URL"], let url = try? normalize(value) { return url }
+        if let value = defaults.string(forKey: preferenceKey), let url = try? normalize(value) { return url }
+        // Build-owned defaults must not disappear when signing out removes a credential.
+        if let value = defaultOrigin, let url = try? normalize(value) { return url }
+        if (try? hasLegacySession()) == true { return URL(string: legacyOrigin)! }
         return URL(string: "http://127.0.0.1:8888")!
     }
 }
