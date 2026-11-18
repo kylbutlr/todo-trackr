@@ -1,0 +1,57 @@
+# Dependencies and builds
+node_modules/
+dist/
+.netlify/
+.trigger/
+.swiftpm/
+.build/
+DerivedData/
+*.tsbuildinfo
+
+# Local environment and secrets
+.radar-local/
+.env
+.env.*
+!.env.example
+!.env.self-hosted.example
+
+# Apple
+.DS_Store
+*.xcuserstate
+xcuserdata/
+
+# Logs and coverage
+*.log
+coverage/
+apps/web/public/updates/old_updates/
+
+# Python installer tests
+__pycache__/
+
+# Temporary, console-free Radar diagnostics, excluded from extension packages.
+/apps/browser-extension/radar-diagnostics-local/
+
+# Optional owner-only integrations, never required by a public checkout.
+/apps/macos/Personal/
+/personal/
+/apps/browser-extension/radar*.js
+/docs/radar*
+/hosting/
+/integrations/
+/scripts/radar/
+/scripts/radar-auth.mjs
+/scripts/register-radar-native-host.py
+/scripts/check-radar-macos-closed.sh
+/scripts/test-radar-macos-delivery.mjs
+/scripts/preview-work-providers.mjs
+/tests/radar*
+/tests/test_radar_native_registration.py
+/tests/work-provider-safety.test.ts
+/vitest.radar-auth.config.ts
+/netlify/functions/lib/automation/radar*.ts
+/netlify/functions/lib/automation/work-provider*.ts
+/netlify/functions/lib/automation/shortcut-provider.ts
+/apps/web/src/WorkProviderSettingsView.tsx
+
+.build-*/
+/apps/web/dist-personal/

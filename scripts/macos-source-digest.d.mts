@@ -1,0 +1,7 @@
+export type NativeSourceDigest = {
+  algorithm: "sha256";
+  digest: string;
+  files: string[];
+};
+
+export function nativeSourceDigest(root?: string, profile?: "public" | "personal"): Promise<NativeSourceDigest>;
